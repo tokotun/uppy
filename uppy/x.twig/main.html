@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block brand %}
+            <a class="brand" href='http://localhost/uppy/upload'>UPPY</a>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Последние файлы</h1>  
+    <div class="main-column">
+    <ul>
+        {% for file in files %}
+            <li>
+                <a href="http://localhost/uppy/{{ file.key }}" title="{{ file.name }}">{{ file.name }}</a>
+                <span class="filesize">283.8 КБ</span>
+            </li>
+        {% endfor %}
+    </ul>
+            <p>
+            <a href="http://localhost/uppy/">Далее →</a>
+            </p>
+    </div>
+</div> 
+{% endblock %}

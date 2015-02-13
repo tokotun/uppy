@@ -1,0 +1,3 @@
+﻿# ингорировать файлы в папке vendor
+vendor/
+forTest/

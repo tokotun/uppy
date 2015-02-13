@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block brand %}
+            <a class="brand" href='http://localhost/uppy/upload'>UPPY</a>
+{% endblock %}
+{% block content %}
+        <div class="container">
+            <p><strong>Файл</strong> - {{ file.name }}</p>
+            <p>{{ file.size }} байт</p>
+            <p>{{ file.dateLoad }}</p>
+            <p>{{ file.key }}</p>
+        </div>
+{% endblock %}
