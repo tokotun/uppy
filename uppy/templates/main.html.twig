@@ -1,7 +1,7 @@
-{% extends "base.html" %}
+{% extends "base.html.twig" %}
 
 {% block brand %}
-            <a class="brand" href='http://localhost/uppy/upload'>UPPY</a>
+            <a class="brand" href='{{ hostName }}/upload'>UPPY</a>
 {% endblock %}
 
 {% block content %}
@@ -11,13 +11,13 @@
     <ul>
         {% for file in files %}
             <li>
-                <a href="http://localhost/uppy/{{ file.key }}" title="{{ file.name }}">{{ file.name }}</a>
+                <a href="{{ hostName }}/{{ file.key }}" title="{{ file.name }}">{{ file.name }}</a>
                 <span class="filesize">283.8 КБ</span>
             </li>
         {% endfor %}
     </ul>
             <p>
-            <a href="http://localhost/uppy/">Далее →</a>
+            <a href="{{ hostName }}">Далее →</a>
             </p>
     </div>
 </div> 

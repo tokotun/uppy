@@ -1,6 +1,7 @@
 {
     "require": {
-        "slim/slim": "2.*",
-		"twig/twig": "1.18.*@dev"
+        "slim/slim": "2.5.0",
+		"twig/twig": "~1.18",
+		"slim/extras": "~2.0.3"
     }
 }

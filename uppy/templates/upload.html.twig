@@ -1,12 +1,12 @@
-{% extends "base.html" %}
+{% extends "base.html.twig" %}
 
 {% block brand %}
-            <a class="brand" href='http://localhost/uppy/main'>UPPY</a>
+            <a class="brand" href='{{ hostName }}/main'>UPPY</a>
 {% endblock %}
 {% block content %}
-    <div class="container-fluid" id="content" style="">
+    <div class="container-fluid">
         <center>
-        <form accept-charset="UTF-8" action="http://localhost/uppy/upload" enctype="multipart/form-data" method="post">
+        <form accept-charset="UTF-8" action="{{ hostName }}/upload" enctype="multipart/form-data" method="post">
             <input name="file" size="50" type="file">
             <input class="btn upload" name="submit" value="Отправить" type="submit">
         </form>
