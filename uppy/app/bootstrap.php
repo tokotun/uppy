@@ -1,5 +1,4 @@
 <?php
-    require 'uppy/app/appvars.php';
     require 'uppy/app/connectvars.php';
     require_once 'uppy/app/autoloader.php';
     spl_autoload_register('autoloader');
