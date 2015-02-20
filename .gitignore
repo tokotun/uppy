@@ -1,4 +1,4 @@
 ﻿# ингорировать файлы в папке vendor
 vendor/
-forTest/
+forTest
 uppy/container/
