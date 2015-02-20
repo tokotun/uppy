@@ -54,13 +54,14 @@ $app->get('/upload', function () use ($app){
 });
 
 $app->post('/upload',function () use ($app){
+		
     $fileMapper = $app->fileMapper;
     $maxFileSize = $app->config('maxFileSize');
     $errorLoad = getErrorLoad($maxFileSize);
 	$file = createFile($errorLoad);
     
     if (isset($_POST['submit'])) {
-        if (!$errorLoad->getError())
+        if ($errorLoad->getError() == false)
         {
             $target = __DIR__ . $app->config('uploadPath') . $file->key;
             if (rename($file->tmpName, $target)) {
@@ -93,7 +94,7 @@ $app->get('/:key', function ($key) use ($app){
 $app->get('/download/:key', function ($key) use ($app){
 	$fileMapper = $app->fileMapper;
 	$file = $fileMapper->loadFile($key);
-	print_r($file); echo "<br>";
+
 	$file->fileForceDownload($app->config('dirHost'));
 
 

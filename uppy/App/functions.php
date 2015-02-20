@@ -2,6 +2,8 @@
 	function getErrorLoad($maxFileSize)
 	{
 		$errorLoad = new ErrorLoad;
+		
+		$errorLoad->setError($_FILES['file']['error']);
 		$errorLoad->errorSize($_FILES['file']['size'], $maxFileSize);
 		$errorLoad->errorUpload();
 		return $errorLoad;

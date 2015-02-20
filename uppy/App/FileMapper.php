@@ -42,6 +42,6 @@ class FileMapper
         $file->size = $result['size'];
         $file->key = $result['key'];
         $file->dateLoad = $result['dateLoad'];
-        return $result;
+        return $file;
     }
 }
