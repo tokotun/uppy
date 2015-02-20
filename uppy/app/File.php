@@ -1,5 +1,5 @@
 <?php
-namespace Uppy;
+namespace Uppy\\;
 class File
 {
     public $name = '';
