@@ -1,5 +1,5 @@
 <?php
-namespace Uppy\\;
+namespace Uppy;
 Class ErrorLoad
 {
     public $error = true;

@@ -1,5 +1,5 @@
 <?php
-namespace Uppy\\;
+namespace Uppy;
 class FileMapper
 {
     protected $db;
