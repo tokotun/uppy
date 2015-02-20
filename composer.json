@@ -6,6 +6,6 @@
 		"slim/views": "~0.1.3"
     },
 	"autoload": {
-        "classmap": ["uppy/App"]
-    }
+			"psr-4": {"Uppy\\": "uppy/app/"}
+	}
 }

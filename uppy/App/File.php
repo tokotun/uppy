@@ -1,4 +1,5 @@
 <?php
+namespace Uppy;
 class File
 {
     public $name = '';

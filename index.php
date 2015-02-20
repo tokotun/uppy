@@ -1,8 +1,8 @@
 <?php
 $loader = require 'vendor/autoload.php';
-$loader->add('App\\FileMapper\\', __DIR__);
+$loader->add('app\\FileMapper\\', __DIR__);
 
-require 'uppy/App/functions.php';
+require 'uppy/app/functions.php';
 
 
 
