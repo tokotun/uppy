@@ -4,8 +4,6 @@ $loader->add('app\\FileMapper\\', __DIR__);
 
 require 'uppy/app/functions.php';
 
-
-
 $twigView = new \Slim\Views\Twig();
 
 // Slim
