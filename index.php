@@ -25,7 +25,7 @@ $app->container->singleton('fileMapper', function() use ($app){
 	$dbc = 'mysql:host=' . $app->config('dbHost') . ';dbname=' . $app->config('dbName');
     $pdo = new PDO($dbc, $app->config('dbUser'), $app->config('dbPassword'));
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    return $fileMapper = new FileMapper($pdo);
+    return $fileMapper = new Uppy\FileMapper($pdo);
 });
 
 $view = $app->view();
