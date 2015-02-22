@@ -86,6 +86,10 @@ $app->get('/main', function () use ($app){
 $app->get('/:key', function ($key) use ($app){
 	$fileMapper = $app->fileMapper;
 	$file = $fileMapper->loadFile($key);
+
+	$filename = $app->config('dirHost') . "\\uppy\\container\\" . $file->key;
+	resizeImage($filename);
+
     $app->render('download.html.twig', array('file' => $file, 'hostName' => $app->config('hostName')) );
 });
 
@@ -95,8 +99,8 @@ $app->get('/download/:key', function ($key) use ($app){
 	print_r($file); echo '<br>';
 	print_r($app->config('dirHost')); echo '<br>';
 	$file->fileForceDownload($app->config('dirHost'));
-	//header("Location: $file->key");
-    //die();
+	header("Location: $file->key");
+    die();
 
 });
 

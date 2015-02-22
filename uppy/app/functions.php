@@ -21,3 +21,22 @@
         }
         return $file;
 	}
+
+	function resizeImage($filename, $newWidth = 140, $newHeight = 140)
+	{
+		// Тип содержимого
+		
+		list($width, $height) = getimagesize($filename);
+
+		// Загрузка
+		$thumb = imagecreatetruecolor($newWidth, $newHeight);
+		$source = imagecreatefromjpeg($filename);
+		header('Content-Type: image/jpeg');
+		// Масштабирование
+		imagecopyresized($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+		//imagecopyresampled($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+		// Вывод
+		imagejpeg($thumb);
+		
+		//return $thumb;
+	}

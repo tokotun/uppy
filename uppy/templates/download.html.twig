@@ -11,5 +11,6 @@
         <p>{{ file.size }} байт</p>
         <p>{{ file.dateLoad }}</p>
         <p>{{ file.key }}</p>
+        <a href="{{ hostName }}/download/{{ file.key }}" title="{{ file.name }}">Скачать</a>
     </div>
 {% endblock %}
