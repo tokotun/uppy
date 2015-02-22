@@ -25,7 +25,7 @@ $app->container->singleton('fileMapper', function() use ($app){
 	$dbc = 'mysql:host=' . $app->config('dbHost') . ';dbname=' . $app->config('dbName');
     $pdo = new PDO($dbc, $app->config('dbUser'), $app->config('dbPassword'));
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    return $fileMapper = new Uppy\FileMapper($pdo);
+    return $fileMapper = new \Uppy\FileMapper($pdo);
 });
 
 $view = $app->view();
@@ -92,9 +92,11 @@ $app->get('/:key', function ($key) use ($app){
 $app->get('/download/:key', function ($key) use ($app){
 	$fileMapper = $app->fileMapper;
 	$file = $fileMapper->loadFile($key);
-
+	print_r($file); echo '<br>';
+	print_r($app->config('dirHost')); echo '<br>';
 	$file->fileForceDownload($app->config('dirHost'));
-
+	//header("Location: $file->key");
+    //die();
 
 });
 

@@ -4,7 +4,7 @@ class FileMapper
 {
     protected $db;
 
-    public function __construct(PDO $db)
+    public function __construct(\PDO $db)
     {
         $this->db = $db;
     }
@@ -25,7 +25,7 @@ class FileMapper
         $sql = "SELECT `name`, `key` FROM files";
         $statment = $this->db->prepare($sql);
         $statment->execute();
-        $result = $statment->fetchAll(PDO::FETCH_ASSOC);
+        $result = $statment->fetchAll(\PDO::FETCH_ASSOC);
  
         return $result;
     }
@@ -37,8 +37,8 @@ class FileMapper
         $statment = $this->db->prepare($sql);
         $statment->bindValue(':key', $key);
         $statment->execute();
-        $result = $statment->fetch(PDO::FETCH_ASSOC);
-        $file = new File;
+        $result = $statment->fetch(\PDO::FETCH_ASSOC);
+        $file = new \Uppy\File;
         $file->name = $result['name'];
         $file->size = $result['size'];
         $file->key = $result['key'];

@@ -20,7 +20,9 @@ class File
     }
 
     function fileForceDownload($dirHost) {
-        $path = $dirHost . '\\' . $this->key;
+        $path = $dirHost . '\\uppy\\container\\' . $this->key;
+        //$path = 'uppy/container/' . $this->key;
+        print_r($path); echo '<br>';
         if (file_exists($path)) {
             // сбрасываем буфер вывода PHP, чтобы избежать переполнения памяти выделенной под скрипт
             // если этого не сделать файл будет читаться в память полностью!
@@ -35,7 +37,7 @@ class File
             header('Expires: 0');
             header('Cache-Control: must-revalidate');
             header('Pragma: public');
-            header('Content-Length: ' . filesize($this->size));
+            header('Content-Length: ' . $this->size);
             // читаем файл и отправляем его пользователю
             readfile($path);
             exit;
