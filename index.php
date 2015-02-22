@@ -84,13 +84,18 @@ $app->get('/main', function () use ($app){
 });
 
 $app->get('/:key', function ($key) use ($app){
+	$isImage = false;
+
 	$fileMapper = $app->fileMapper;
 	$file = $fileMapper->loadFile($key);
-
+	
 	if (getimagesize($app->config('uploadPath') . '/' . $file->key)){
 		resizeImage($file->key, $app->config('uploadPath'));
+		$isImage = true;
 	}
-    $app->render('download.html.twig', array('file' => $file, 'hostName' => $app->config('hostName')) );
+    $app->render('download.html.twig', array('file' => $file, 'hostName' => $app->config('hostName'), 
+    	'isImage' => $isImage)
+    );
 });
 
 $app->get('/download/:key', function ($key) use ($app){

@@ -6,7 +6,9 @@
 
 {% block content %}
     <div class="container">
-    	<img class="img-polaroid" src="uppy/container/_{{ file.key }}"">
+    	{% if isImage == true %}
+    		<img class="img-polaroid" src="uppy/container/_{{ file.key }}"">
+		{% endif %}
         <p><strong>Файл</strong> - {{ file.name }}</p>
         <p>{{ file.size }} байт</p>
         <p>{{ file.dateLoad }}</p>
