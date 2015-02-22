@@ -6,7 +6,7 @@
 
 {% block content %}
     <div class="container">
-    	<img src="uppy/container/{{ file.key }}" class="img-polaroid width="140" height="140"">
+    	<img class="img-polaroid" src="uppy/container/_{{ file.key }}"">
         <p><strong>Файл</strong> - {{ file.name }}</p>
         <p>{{ file.size }} байт</p>
         <p>{{ file.dateLoad }}</p>

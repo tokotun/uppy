@@ -9,7 +9,7 @@ $twigView = new \Slim\Views\Twig();
 // Slim
 $app = new \Slim\Slim(array(
 	'dirHost' => __DIR__,
-	'uploadPath' => '/uppy/container/', //путь к папке с хранимыми файлами
+	'uploadPath' => 'uppy/container/', //путь к папке с хранимыми файлами
 	'maxFileSize' => 1048576,      // 1024 KB
 	'hostName' => 'http://localhost/uppy',  
 	'dbHost' => 'localhost', //имя базы данных
@@ -61,7 +61,7 @@ $app->post('/upload',function () use ($app){
     if (isset($_POST['submit'])) {
         if ($errorLoad->getError() == false)
         {
-            $target = __DIR__ . $app->config('uploadPath') . $file->key;
+            $target = __DIR__ . '/' . $app->config('uploadPath') . $file->key;
             if (rename($file->tmpName, $target)) {
                 $fileMapper->saveFile($file);
             }
@@ -87,9 +87,9 @@ $app->get('/:key', function ($key) use ($app){
 	$fileMapper = $app->fileMapper;
 	$file = $fileMapper->loadFile($key);
 
-	$filename = $app->config('dirHost') . "\\uppy\\container\\" . $file->key;
-	resizeImage($filename);
-
+	if (getimagesize($app->config('uploadPath') . '/' . $file->key)){
+		resizeImage($file->key, $app->config('uploadPath'));
+	}
     $app->render('download.html.twig', array('file' => $file, 'hostName' => $app->config('hostName')) );
 });
 

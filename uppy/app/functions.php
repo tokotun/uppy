@@ -22,21 +22,28 @@
         return $file;
 	}
 
-	function resizeImage($filename, $newWidth = 140, $newHeight = 140)
+	function resizeImage($filename, $uploadPath, $maxSize = 200)
 	{
-		// Тип содержимого
-		
-		list($width, $height) = getimagesize($filename);
+		$path = $uploadPath . $filename;
+		list($width, $height) = getimagesize($path);
+
+		if (($width > 0) and ($height > 0)) {
+			if ($width > $height) {
+				$newWidth = $maxSize;
+				$newHeight = $maxSize * ($height/$width);
+			} else {
+				$newHeight = $maxSize;
+				$newWidth = $maxSize * ($width/$height);
+			}
+		}
 
 		// Загрузка
 		$thumb = imagecreatetruecolor($newWidth, $newHeight);
-		$source = imagecreatefromjpeg($filename);
-		header('Content-Type: image/jpeg');
+		$source = imagecreatefromjpeg($path);
+		//header('Content-Type: image/jpeg');
 		// Масштабирование
-		imagecopyresized($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-		//imagecopyresampled($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+		//imagecopyresized($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+		imagecopyresampled($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
 		// Вывод
-		imagejpeg($thumb);
-		
-		//return $thumb;
+		imagejpeg($thumb, 'uppy\\container\\' . '_' . $filename);
 	}

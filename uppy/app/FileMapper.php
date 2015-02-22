@@ -22,7 +22,7 @@ class FileMapper
 
     public function getFiles()
     {
-        $sql = "SELECT `name`, `key` FROM files";
+        $sql = "SELECT `name`, `key` FROM files ORDER BY dateLoad DESC LIMIT 100";
         $statment = $this->db->prepare($sql);
         $statment->execute();
         $result = $statment->fetchAll(\PDO::FETCH_ASSOC);
