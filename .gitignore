@@ -1,4 +1,4 @@
-﻿vendor/
-tmp/
+﻿vendor
+tmp
 forTest
 uppy/container/
