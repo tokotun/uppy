@@ -12,7 +12,7 @@
             {% for file in files %}
                 <li>
                 <a href="{{ hostName }}/{{ file.key }}" title="{{ file.name }}">{{ file.name }}</a>
-                <span class="filesize">283.8 КБ</span>
+                <span>{{  file.getSize  }}</span>
                 </li>
             {% endfor %}
         </ul>

@@ -6,6 +6,16 @@ Class ErrorLoad
     public $errorSize = '';
     public $errorUpload = '';
 
+    public static function createX($maxFileSize)
+    {
+        $errorLoad = new \Uppy\ErrorLoad;
+        
+        $errorLoad->setError($_FILES['file']['error']);
+        $errorLoad->errorSize($_FILES['file']['size'], $maxFileSize);
+        $errorLoad->errorUpload();
+        return $errorLoad;
+    }
+
     public function getError()
     {
         return $this->error;

@@ -1,6 +1,5 @@
 <?php
-$loader = require 'vendor/autoload.php';
-$loader->add('app\\FileMapper\\', __DIR__);
+require 'vendor/autoload.php';
 
 require 'uppy/app/functions.php';
 
@@ -25,13 +24,13 @@ $app->container->singleton('fileMapper', function() use ($app){
 	$dbc = 'mysql:host=' . $app->config('dbHost') . ';dbname=' . $app->config('dbName');
     $pdo = new PDO($dbc, $app->config('dbUser'), $app->config('dbPassword'));
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    return $fileMapper = new \Uppy\FileMapper($pdo);
+    return new \Uppy\FileMapper($pdo);
 });
 
 $view = $app->view();
 $view->parserOptions = array(
     'debug' => true,
-    'cache' => dirname(__FILE__) . '/vendor/twig/cache',
+    'cache' => dirname(__FILE__) . '/tmp/cache',
     'auto_reload' => true
 );
 
@@ -55,7 +54,7 @@ $app->post('/upload',function () use ($app){
 		
     $fileMapper = $app->fileMapper;
     $maxFileSize = $app->config('maxFileSize');
-    $errorLoad = getErrorLoad($maxFileSize);
+    $errorLoad = \Uppy\ErrorLoad::createX($maxFileSize);
 	$file = createFile($errorLoad);
     
     if (isset($_POST['submit'])) {
@@ -64,6 +63,9 @@ $app->post('/upload',function () use ($app){
             $target = __DIR__ . '/' . $app->config('uploadPath') . $file->key;
             if (rename($file->tmpName, $target)) {
                 $fileMapper->saveFile($file);
+                if (getimagesize($app->config('uploadPath') . '/' . $file->key)){
+					resizeImage($file->key, $app->config('uploadPath'));
+				}
             }
         }
 
@@ -89,24 +91,16 @@ $app->get('/:key', function ($key) use ($app){
 	$fileMapper = $app->fileMapper;
 	$file = $fileMapper->loadFile($key);
 	
-	if (getimagesize($app->config('uploadPath') . '/' . $file->key)){
-		resizeImage($file->key, $app->config('uploadPath'));
-		$isImage = true;
-	}
-    $app->render('download.html.twig', array('file' => $file, 'hostName' => $app->config('hostName'), 
-    	'isImage' => $isImage)
+    $app->render('download.html.twig', array('file' => $file, 'hostName' => $app->config('hostName'))
     );
 });
 
 $app->get('/download/:key', function ($key) use ($app){
 	$fileMapper = $app->fileMapper;
 	$file = $fileMapper->loadFile($key);
-	print_r($file); echo '<br>';
-	print_r($app->config('dirHost')); echo '<br>';
-	$file->fileForceDownload($app->config('dirHost'));
+	fileForceDownload($file, $app->config('dirHost'));
 	header("Location: $file->key");
     die();
-
 });
 
 $app->run();

@@ -8,6 +8,26 @@ class File
     public $key = '';
     public $dateLoad = '';
 
+    public function getSize()
+    {
+        $size = $this->size;
+
+        if ($size < 1500){
+            return $size . ' байт';
+        } else {
+            $size = round(($size /1024), 1);
+        }
+
+        if ($size < 1500){
+            return $size . ' Кб';
+        } else {
+            $size = round(($size /1024), 1);
+        }
+
+        return $size . ' Мб';
+
+    }
+
     public function generateKey()
     {
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -19,28 +39,24 @@ class File
         return $key;
     }
 
-    function fileForceDownload($dirHost) {
-        $path = $dirHost . '\\uppy\\container\\' . $this->key;
-        //$path = 'uppy/container/' . $this->key;
-        print_r($path); echo '<br>';
-        if (file_exists($path)) {
-            // сбрасываем буфер вывода PHP, чтобы избежать переполнения памяти выделенной под скрипт
-            // если этого не сделать файл будет читаться в память полностью!
-            if (ob_get_level()) {
-                ob_end_clean();
-            }
-            // заставляем браузер показать окно сохранения файла
-            header('Content-Description: File Transfer');
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename=' . $this->name);
-            header('Content-Transfer-Encoding: binary');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate');
-            header('Pragma: public');
-            header('Content-Length: ' . $this->size);
-            // читаем файл и отправляем его пользователю
-            readfile($path);
-            exit;
-        }
+    public function isImage(){
+        $path = 'uppy/container/thumbs/' . $this->key;
+        if ((is_file($path)) and (getimagesize($path))) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }    
     }
+
+    public function getPathThumbs()
+    {
+        $path = 'uppy/container/thumbs/' . $this->key;
+        return $path;
+    }
+    
+    public function getDownloadLink($hostname)
+    {
+        return $hostname . '/download/' . $this->key;
+    }
+
 }

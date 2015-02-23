@@ -1,15 +1,5 @@
 <?php
-	function getErrorLoad($maxFileSize)
-	{
-		$errorLoad = new \Uppy\ErrorLoad;
-		
-		$errorLoad->setError($_FILES['file']['error']);
-		$errorLoad->errorSize($_FILES['file']['size'], $maxFileSize);
-		$errorLoad->errorUpload();
-		return $errorLoad;
-	}
-
-	function createFile($errorLoad)
+	function createFile(\Uppy\ErrorLoad $errorLoad)
 	{
 		$file = new \Uppy\File;
 		if ($errorLoad->getError() == false) {
@@ -45,5 +35,29 @@
 		//imagecopyresized($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
 		imagecopyresampled($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
 		// Вывод
-		imagejpeg($thumb, 'uppy\\container\\' . '_' . $filename);
+		imagejpeg($thumb, 'uppy\\container\\thumbs\\' . $filename);
 	}
+
+	function fileForceDownload(\Uppy\file $file, $dirHost) 
+    {
+        $path = $dirHost . '\\uppy\\container\\' . $file->key;
+        if (file_exists($path)) {
+            // сбрасываем буфер вывода PHP, чтобы избежать переполнения памяти выделенной под скрипт
+            // если этого не сделать файл будет читаться в память полностью!
+            if (ob_get_level()) {
+                ob_end_clean();
+            }
+            // заставляем браузер показать окно сохранения файла
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename=' . $file->name);
+            header('Content-Transfer-Encoding: binary');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . $file->size);
+            // читаем файл и отправляем его пользователю
+            readfile($path);
+            exit;
+        }
+    }

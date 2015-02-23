@@ -1,4 +1,6 @@
-﻿# ингорировать файлы в папке vendor
-vendor/
+﻿vendor/
+tmp/
 forTest
-uppy/container
+uppy/container/
+!uppy/container/thumbs/
+uppy/container/thumbs

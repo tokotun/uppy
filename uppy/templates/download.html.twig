@@ -6,13 +6,17 @@
 
 {% block content %}
     <div class="container">
-    	{% if isImage == true %}
-    		<img class="img-polaroid" src="uppy/container/_{{ file.key }}"">
+    	{% if file %}
+		   	{%  if  file.isImage()   %}
+	    		<img class="img-polaroid" src="{{ file.getPathThumbs() }}"">
+			{% endif %}
+	        <p><strong>Файл</strong> - {{ file.name }}</p>
+	        <p>{{ file.getSize() }}</p>
+	        <p>{{ file.dateLoad }}</p>
+	        <p>{{ file.key }}</p>
+	        <a href="{{  file.getDownloadLink( hostName )  }}" title="{{ file.name }}">Скачать</a>
+		{% else %}
+		    <h1>Файл не найден!</h1>
 		{% endif %}
-        <p><strong>Файл</strong> - {{ file.name }}</p>
-        <p>{{ file.size }} байт</p>
-        <p>{{ file.dateLoad }}</p>
-        <p>{{ file.key }}</p>
-        <a href="{{ hostName }}/download/{{ file.key }}" title="{{ file.name }}">Скачать</a>
     </div>
 {% endblock %}
