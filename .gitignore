@@ -1,5 +1,4 @@
-﻿tmp/
+﻿vendor/
+tmp/
 forTest
 uppy/container/
-!uppy/container/thumbs
-uppy/container/thumbs/
