@@ -55,7 +55,7 @@ $app->post('/upload',function () use ($app){
     $fileMapper = $app->fileMapper;
     $maxFileSize = $app->config('maxFileSize');
     $errorLoad = \Uppy\ErrorLoad::createX($maxFileSize);
-	$file = createFile($errorLoad);
+	$file = \Uppy\Uploader::createFile($errorLoad);
     
     if (isset($_POST['submit'])) {
         if ($errorLoad->getError() == false)
@@ -64,7 +64,7 @@ $app->post('/upload',function () use ($app){
             if (rename($file->tmpName, $target)) {
                 $fileMapper->saveFile($file);
                 if (getimagesize($app->config('uploadPath') . '/' . $file->key)){
-					resizeImage($file->key, $app->config('uploadPath'));
+					\Uppy\Uploader::resizeImage($file->key, $app->config('uploadPath'));
 				}
             }
         }
