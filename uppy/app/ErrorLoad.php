@@ -6,7 +6,7 @@ Class ErrorLoad
     public $errorSize = '';
     public $errorUpload = '';
 
-    public static function createX($maxFileSize)
+    public static function validateLoadFile($maxFileSize)
     {
         $errorLoad = new \Uppy\ErrorLoad;
         

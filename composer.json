@@ -3,7 +3,8 @@
         "slim/slim": "2.5.0",
 		"twig/twig": "~1.18",
 		"slim/extras": "~2.0.3",
-		"slim/views": "~0.1.3"
+		"slim/views": "~0.1.3",
+		"james-heinrich/getid3": "~1.9.9"
     },
 	"autoload": {
 		"psr-4": {"Uppy\\": "uppy/app/"}

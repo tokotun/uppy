@@ -20,6 +20,17 @@ class FileMapper
         $statment->execute();
     }
 
+    public function getId($key)
+    {
+        $sql = "SELECT `id` FROM files WHERE `key`=:key";
+        $statment = $this->db->prepare($sql);
+        $statment->bindValue(':key', $key);
+        $statment->execute();
+        $result = $statment->fetch(\PDO::FETCH_ASSOC);
+
+        return $result['id'];
+    }
+
     public function getFiles()
     {
         $sql = "SELECT `name`, `size`, `key` FROM files ORDER BY dateLoad DESC LIMIT 100";
