@@ -68,11 +68,19 @@ $app->post('/upload',function () use ($app){
     if (isset($_POST['submit'])) {
         if ($errorLoad->getError() == false)
         {
-            $target = __DIR__ . '/' . $app->config('uploadPath') . $file->key;
+            $file->id = $fileMapper->lastId();
+
+            $fileName = $file->getNameForSave();
+
+            $target = __DIR__ . '/' . $app->config('uploadPath') .  $fileName;
+            
             if (rename($file->tmpName, $target)) {
                 $fileMapper->saveFile($file);
-                if (getimagesize($app->config('uploadPath') . '/' . $file->key)){
-					\Uppy\Uploader::resizeImage($file->key, $app->config('uploadPath'));
+
+                
+                if (getimagesize($app->config('uploadPath') . $fileName)){
+                    
+					\Uppy\Uploader::resizeImage($fileName, $app->config('uploadPath'));
 				}
             }
             header("Location: $file->key");
@@ -98,12 +106,12 @@ $app->get('/:key', function ($key) use ($app){
 	$fileMapper = $app->fileMapper;
     $commentsMapper = $app->commentsMapper;
 	$file = $fileMapper->loadFile($key);
-    $idFile = $fileMapper->getId($key);
-    $comments = $commentsMapper->loadComments($idFile);
+    $comments = $commentsMapper->loadComments($file->id);
 
     //-------------------------------------------------------
     //Извлечение медаданных с помощью getID3()
-    $filePath = 'uppy/container/' . $file->key; 
+    $filePath = 'uppy/container/' . $fileName = $file->getNameForSave(); 
+
     $au = new \Uppy\MediaInfo();
     $mediaInfo = $au->getMediaInfo($filePath);
 
@@ -116,7 +124,7 @@ $app->get('/:key', function ($key) use ($app){
     );
 });
 
-$app->get('/download/:key', function ($key) use ($app){
+$app->get('/download/:key/:name', function ($key) use ($app){
 
 	$fileMapper = $app->fileMapper;
 	$file = $fileMapper->loadFile($key);

@@ -11,10 +11,11 @@ Class Uploader
             $file->size = $_FILES['file']['size'];
             $file->tmpName= $_FILES['file']['tmp_name'];
             $file->key = $file->generateKey();
-            $file->dateLoad = date("Y-m-d H:i:s");
+            $file->dateLoad = time();
         }
         return $file;
 	}
+
 
 	public static function resizeImage($filename, $uploadPath, $maxSize = 200)
 	{

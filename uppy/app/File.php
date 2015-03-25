@@ -1,12 +1,28 @@
 <?php
 namespace Uppy;
 class File
-{
+{   
+    public $id = '';
     public $name = '';
     public $size = '';
     public $tmpName = '';
     public $key = '';
     public $dateLoad = '';
+
+    /**
+    * Даёт имя файла для сохранения на сервер.
+    *
+    */
+    public function getNameForSave()
+    {
+        $fileName = $this->id . '_' . $this->name;
+        //Меняем кодировку имени, если наша ОС принадлежит семейству виндовс
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            return $saveFileName = iconv("UTF-8", "CP1251", $fileName);
+        } else {
+            return $saveFileName = $fileName;
+        }
+    }
 
     public function getSize()
     {
@@ -28,6 +44,13 @@ class File
 
     }
 
+    public function getDate(){
+        return date("Y-m-d H:i:s", $this->dateLoad);
+    }
+
+
+
+
     public function generateKey()
     {
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -40,7 +63,7 @@ class File
     }
 
     public function isImage(){
-        $path = 'uppy/container/thumbs/' . $this->key;
+        $path = 'uppy/container/thumbs/' . $this->id . '_' . $this->name;
         if ((is_file($path)) and (getimagesize($path))) {
             return TRUE;
         } else {
@@ -50,13 +73,13 @@ class File
 
     public function getPathThumbs()
     {
-        $path = 'uppy/container/thumbs/' . $this->key;
+        $path = 'uppy/container/thumbs/' . $this->id . '_' . $this->name;
         return $path;
     }
     
     public function getDownloadLink($hostname)
     {
-        return $hostname . '/download/' . $this->key;
+        return $hostname . '/download/' . $this->key . '/' . rawurlencode($this->name);
     }
 
 }

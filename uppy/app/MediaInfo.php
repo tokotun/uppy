@@ -9,8 +9,8 @@ class MediaInfo {
 	/**
 	* Private variables
 	*/
-	var $result = NULL;
-	var $info   = NULL;
+	private $result = NULL;
+	private $info   = NULL;
 
 	/**
 	* Constructor
@@ -27,7 +27,6 @@ class MediaInfo {
 
 	function getMediaInfo($filePath){
 		$finfo = finfo_open(FILEINFO_MIME_TYPE); // возвращает mime-тип
-    
     	if (preg_match('/^audio/',  finfo_file($finfo, $filePath))){ //если MIME тип 'audio' 
 	        finfo_close($finfo); 
 	        return $this->AudioInfo($filePath); //эта функция вернёт информацию о медиа файле
@@ -42,10 +41,8 @@ class MediaInfo {
 	/**
 	* Extract information - only public function
 	*
-	* @access   public
-	* @param    string  file    Audio file to extract info from.
 	*/
-	function AudioInfo($file) {
+	public function AudioInfo($file) {
 
 		// Analyze file
 		$this->info = $this->getID3->analyze($file);
