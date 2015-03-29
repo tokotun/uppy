@@ -9,7 +9,7 @@ $twigView = new \Slim\Views\Twig();
 // Slim
 $app = new \Slim\Slim(array(
     'dirHost' => __DIR__,
-    'uploadPath' => 'uppy\\container\\', //путь к папке с хранимыми файлами
+    'uploadPath' => 'uppy/container/', //путь к папке с хранимыми файлами
     'maxFileSize' => 33554432,      // 32 MB
     'hostName' => 'http://localhost/uppy',  
     'dbHost' => 'localhost', //имя базы данных
@@ -17,7 +17,7 @@ $app = new \Slim\Slim(array(
     'dbPassword' => 'root',  //пароль к базе данных
     'dbName' => 'uppy',      //имя базы данных
     'view' => $twigView,
-    'templates.path' => 'uppy\\templates\\'
+    'templates.path' => 'uppy/templates/'
     
 ));
 
@@ -111,7 +111,7 @@ $app->get('/:key', function ($key) use ($app){
     //-------------------------------------------------------
     //Извлечение медаданных с помощью getID3()
     $filePath = 'uppy/container/' . $fileName = $file->getNameForSave(); 
-
+    
     $au = new \Uppy\MediaInfo();
     $mediaInfo = $au->getMediaInfo($filePath);
 

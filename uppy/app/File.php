@@ -15,7 +15,8 @@ class File
     */
     public function getNameForSave()
     {
-        $fileName = $this->id . '_' . $this->name;
+        $fileName = $this->getSavedName();
+        
         //Меняем кодировку имени, если наша ОС принадлежит семейству виндовс
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             return $saveFileName = iconv("UTF-8", "CP1251", $fileName);
@@ -23,6 +24,16 @@ class File
             return $saveFileName = $fileName;
         }
     }
+
+    /**
+    * Формирует имя файла, которое он имеет когда лежит в файловой системе.
+    *
+    */
+    public function getSavedName()
+    {
+        return "$this->id _ $this->name _";
+    }
+
 
     public function getSize()
     {
@@ -63,23 +74,23 @@ class File
     }
 
     public function isImage(){
-        $path = 'uppy/container/thumbs/' . $this->id . '_' . $this->name;
+        $path = 'uppy/container/thumbs/' . $this->getNameForSave();
         if ((is_file($path)) and (getimagesize($path))) {
-            return TRUE;
+            return true;
         } else {
-            return FALSE;
+            return false;
         }    
     }
 
     public function getPathThumbs()
     {
-        $path = 'uppy/container/thumbs/' . $this->id . '_' . $this->name;
+        $path = 'uppy/container/thumbs/' . $this->getNameForSave();
         return $path;
     }
     
     public function getDownloadLink($hostname)
     {
-        return $hostname . '/download/' . $this->key . '/' . rawurlencode($this->name);
+        return "$hostname/download/$this->key/" . rawurlencode($this->name);
     }
 
 }

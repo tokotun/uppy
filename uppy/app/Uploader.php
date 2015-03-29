@@ -40,6 +40,6 @@ Class Uploader
         //imagecopyresized($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
         imagecopyresampled($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
         // Вывод
-        imagejpeg($thumb, 'uppy\\container\\thumbs\\' . $filename);
+        imagejpeg($thumb, "uppy/container/thumbs/$filename");
     }
 }
