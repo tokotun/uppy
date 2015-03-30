@@ -13,15 +13,15 @@ class File
     * Даёт имя файла для сохранения на сервер.
     *
     */
-    public function getNameForSave()
+    public function getFileNameInOS()
     {
         $fileName = $this->getSavedName();
-        
         //Меняем кодировку имени, если наша ОС принадлежит семейству виндовс
+        
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            return $saveFileName = iconv("UTF-8", "CP1251", $fileName);
+            return iconv("UTF-8", "CP1251", $fileName);
         } else {
-            return $saveFileName = $fileName;
+            return $fileName;
         }
     }
 
@@ -74,7 +74,7 @@ class File
     }
 
     public function isImage(){
-        $path = 'uppy/container/thumbs/' . $this->getNameForSave();
+        $path = 'uppy/container/thumbs/' . $this->getFileNameInOS();
         if ((is_file($path)) and (getimagesize($path))) {
             return true;
         } else {
@@ -84,7 +84,7 @@ class File
 
     public function getPathThumbs()
     {
-        $path = 'uppy/container/thumbs/' . $this->getNameForSave();
+        $path = 'uppy/container/thumbs/' . $this->getFileNameInOS();
         return $path;
     }
     

@@ -1,5 +1,6 @@
 <?php
 error_reporting(-1);
+mb_internal_encoding("utf-8");
 require 'vendor/autoload.php';
 
 require 'uppy/app/functions.php';
@@ -70,7 +71,7 @@ $app->post('/upload',function () use ($app){
         {
             $file->id = $fileMapper->lastId();
 
-            $fileName = $file->getNameForSave();
+            $fileName = $file->getFileNameInOS();
 
             $target = __DIR__ . '/' . $app->config('uploadPath') .  $fileName;
             
@@ -101,7 +102,6 @@ $app->get('/main', function () use ($app){
 });
 
 $app->get('/:key', function ($key) use ($app){
-    $isImage = false;
 
     $fileMapper = $app->fileMapper;
     $commentsMapper = $app->commentsMapper;
@@ -109,8 +109,8 @@ $app->get('/:key', function ($key) use ($app){
     $comments = $commentsMapper->loadComments($file->id);
 
     //-------------------------------------------------------
-    //Извлечение медаданных с помощью getID3()
-    $filePath = 'uppy/container/' . $fileName = $file->getNameForSave(); 
+    //Извлечение метаданных с помощью getID3()
+    $filePath = 'uppy/container/' . $fileName = $file->getFileNameInOS(); 
     
     $au = new \Uppy\MediaInfo();
     $mediaInfo = $au->getMediaInfo($filePath);
@@ -122,6 +122,25 @@ $app->get('/:key', function ($key) use ($app){
             'hostName' => $app->config('hostName'), 
             'mediaInfo' => $mediaInfo)
     );
+});
+
+$app->post('/:key', function ($key) use ($app){
+    $fileMapper = $app->fileMapper;
+    $commentsMapper = $app->commentsMapper;
+    $newComment = \Uppy\Uploader::createComment();
+
+    //если создан коментарий, то продолжаем заносить его в базу
+    if ($newComment){
+        $newComment->fileId = $fileMapper->getId($key);
+        $idParentComment = \Uppy\Uploader::getIdParentComment();
+
+        $newComment->getNewPathComment($commentsMapper, $idParentComment);
+        
+        $commentsMapper->saveComment($newComment);
+    }
+
+    header("Location: $key");
+    die();
 });
 
 $app->get('/download/:key/:name', function ($key) use ($app){

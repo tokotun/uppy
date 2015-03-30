@@ -1,6 +1,6 @@
 <?php
     function fileForceDownload(\Uppy\file $file, $uploadPath) {
-        $path = $uploadPath . $file->getNameForSave();
+        $path = $uploadPath . $file->getFileNameInOS();
         $pathToSomefile = $file->getSavedName();
 
         if (file_exists($path)) {

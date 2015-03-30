@@ -57,18 +57,30 @@
             </table>
         {% endif %}
 
+        <form name="test" method="post" action="{{ hostName }}/{{ file.key }}">
+
         {% if comments %}
             <h3>Комментарии</h3>
             {% for comment in comments %}
-                <div id="{{  comment.id }}" style="margin-left: {{  (comment.path|length - 1) * 25  }}px;">
+                <div id="{{  comment.id  }}" style="margin-left: {{  (comment.path|length - 1) * 25  }}px;">
                     <div><small>{{  comment.dateLoad  }}</small></div>
-                    <div>{{  comment.message  }}</div>
-                    <div><a href="">Ответить</a></div>
+                    <label class="radio">
+                        <input type="radio" name="id_comment" value="{{  comment.id  }}">{{  comment.message  }}
+                    </label>
                 </div>
             {% endfor %}
+            
         {% else %}
             <h3>Комментариев нет</h3>
         {% endif %}
-        <div><a href="">Написать комментарий</a></div>
+
+            <p>Комментарий<Br>
+                <textarea name="comment" cols="40" rows="4"></textarea>
+            </p>
+            <p>
+                <input type="submit" value="Отправить">
+                <input type="reset" value="Очистить">
+            </p>
+        </form>
     </div>
 {% endblock %}

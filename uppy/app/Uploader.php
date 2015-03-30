@@ -7,13 +7,24 @@ Class Uploader
     {
         $file = new \Uppy\File;
         if ($errorLoad->getError() == false) {
-            $file->name = trim($_FILES['file']['name']);
+            $file->name = $_FILES['file']['name'];
             $file->size = $_FILES['file']['size'];
             $file->tmpName= $_FILES['file']['tmp_name'];
             $file->key = $file->generateKey();
             $file->dateLoad = time();
         }
         return $file;
+    }
+
+    public static function createComment()
+    {
+        if (($_POST['comment']) <> '')  {
+            $comment = new \Uppy\Comment;
+            $comment->message= $_POST['comment'];
+            $comment->dateLoad = time();
+            return $comment;
+        }
+        return false;
     }
 
 
@@ -41,5 +52,14 @@ Class Uploader
         imagecopyresampled($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
         // Вывод
         imagejpeg($thumb, "uppy/container/thumbs/$filename");
+    }
+
+
+    public static function getIdParentComment(){
+        if (isset($_POST['id_comment'])){
+            return $_POST['id_comment'];
+        } else {
+            return false;
+        }
     }
 }
