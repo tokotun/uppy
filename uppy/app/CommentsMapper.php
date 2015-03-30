@@ -55,14 +55,16 @@ class CommentsMapper
         return $result['comment_path'];
     }
 
-    public function getNewCommentPath($parentPath)
+    public function getNewCommentPath($parentPath, $fileId)
     {
         if ($parentPath) 
         {
             //если дан путь родительского коментария, то пытаемся создать путь для нового дочернего
-            $sql = "SELECT `comment_path` FROM comments WHERE `comment_path` LIKE :comment_path AND
+            $sql = "SELECT `comment_path` FROM comments WHERE file_id = :file_id AND
+            `comment_path` LIKE :comment_path AND
             `comment_path` <> :parent_path ORDER BY `comment_path` DESC LIMIT 1";
             $statment = $this->db->prepare($sql);
+            $statment->bindValue(':file_id', $fileId);
             $statment->bindValue(':comment_path', $parentPath . '%');
             $statment->bindValue(':parent_path', $parentPath);
             $statment->execute();
@@ -76,9 +78,12 @@ class CommentsMapper
             //родительский путь сложится с дочерним. Получится путь для нового коментария.
             $newCommentPath = $parentPath . '.' .$numberChildComment; 
         } else {
+
             //если не дан путь родительского коментария, то пытаемся создать новый родительский комментрарий
-            $sql = "SELECT `comment_path` FROM comments ORDER BY `comment_path` DESC LIMIT 1";
+            $sql = "SELECT `comment_path` FROM comments WHERE file_id = :file_id 
+            ORDER BY `comment_path` DESC LIMIT 1";
             $statment = $this->db->prepare($sql);
+            $statment->bindValue(':file_id', $fileId);
             $statment->execute();
             $result = $statment->fetch(\PDO::FETCH_ASSOC);
 

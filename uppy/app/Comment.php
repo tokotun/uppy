@@ -14,8 +14,8 @@ class Comment
     public function getNewPathComment(\Uppy\CommentsMapper $commentsMapper, $idParentComment)
     {
         $parentPath = $commentsMapper->getCommentPaths($idParentComment);
-
-        $this->path = $commentsMapper->getNewCommentPath($parentPath);
+        
+        $this->path = $commentsMapper->getNewCommentPath($parentPath, $this->fileId);
 
     }
 }
