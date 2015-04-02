@@ -11,7 +11,7 @@ $twigView = new \Slim\Views\Twig();
 $app = new \Slim\Slim(array(
     'dirHost' => __DIR__,
     'uploadPath' => 'uppy/container/', //путь к папке с хранимыми файлами
-    'maxFileSize' => 33554432,      // 32 MB
+    'maxFileSize' => 33554432,      // 32 MB . Максимальный размер принимаемых файлов.
     'hostName' => 'http://localhost/uppy',  
     'dbHost' => 'localhost', //имя базы данных
     'dbUser' => 'root',      //имя пользователя базы данных
@@ -34,6 +34,14 @@ $app->container->singleton('commentsMapper', function() use ($app){
     $pdo = new PDO($dbc, $app->config('dbUser'), $app->config('dbPassword'));
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     return new \Uppy\CommentsMapper($pdo);
+});
+
+$app->container->singleton('getID3', function() use ($app){
+    $getID3 = new \getID3;
+    $getID3->option_md5_data        = true;
+    $getID3->option_md5_data_source = true;
+    $getID3->encoding               = 'UTF-8';
+    return $getID3;
 });
 
 $view = $app->view();
@@ -75,7 +83,7 @@ $app->post('/upload',function () use ($app){
 
             $target = __DIR__ . '/' . $app->config('uploadPath') .  $fileName;
             
-            if (rename($file->tmpName, $target)) {
+            if (move_uploaded_file($file->tmpName, $target)) {
                 $fileMapper->saveFile($file);
 
                 
@@ -98,7 +106,10 @@ $app->post('/upload',function () use ($app){
 $app->get('/main', function () use ($app){
     $fileMapper = $app->fileMapper;
     $files = $fileMapper->getFiles();
-    $app->render('main.html.twig', array('files' => $files, 'hostName' => $app->config('hostName')));
+    $app->render('main.html.twig', array(
+        'files' => $files, 
+        'hostName' => $app->config('hostName'))
+    );
 });
 
 $app->get('/:key', function ($key) use ($app){
@@ -111,10 +122,10 @@ $app->get('/:key', function ($key) use ($app){
     //-------------------------------------------------------
     //Извлечение метаданных с помощью getID3()
     $filePath = 'uppy/container/' . $fileName = $file->getFileNameInOS(); 
+    $getID3 = $app->getID3;
+    $mediaInfo = new \Uppy\MediaInfo();
+    $mediaInfo->info = $getID3->analyze($filePath);
     
-    $au = new \Uppy\MediaInfo();
-    $mediaInfo = $au->getMediaInfo($filePath);
-
     //-------------------------------------------------------
     $app->render('download.html.twig', 
         array('file' => $file, 

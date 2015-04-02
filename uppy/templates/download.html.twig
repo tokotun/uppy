@@ -18,41 +18,39 @@
             <h1>Файл не найден!</h1>
         {% endif %}
 
-        {% if mediaInfo.type == 'audio' %}
+        {% if mediaInfo.getTypeInfo() == 'audio' %}
             <table class="table table-bordered">
                 <tr><td colspan="2"><h4>Таги</h4></td></tr>
-                <tr><td>Название:</td>      <td>{{  mediaInfo.title  }}</td></tr>
-                <tr><td>Исполнитель:</td>   <td>{{  mediaInfo.artist  }}</td></tr>
-                <tr><td>Альбом:</td>        <td>{{  mediaInfo.album  }}</td></tr>
-                <tr><td>Год:</td>           <td>{{  mediaInfo.year  }}</td> </tr>
-                <tr><td>Комментарий:</td>   <td>{{  mediaInfo.comment  }}</td></tr>
-                <tr><td>Номер трека:</td>   <td>{{  mediaInfo.track_number  }}</td></tr>
-                <tr><td>Жанр:</td>          <td>{{  mediaInfo.genre  }}</td></tr>
+                <tr><td>Название:</td>      <td>{{  mediaInfo.getTitle()  }}</td></tr>
+                <tr><td>Исполнитель:</td>   <td>{{  mediaInfo.getArtistName()  }}</td></tr>
+                <tr><td>Альбом:</td>        <td>{{  mediaInfo.getAlbumName()  }}</td></tr>
+                <tr><td>Год:</td>           <td>{{  mediaInfo.getYear()  }}</td> </tr>
+                <tr><td>Комментарий:</td>   <td>{{  mediaInfo.getComment()  }}</td></tr>
+                <tr><td>Жанр:</td>          <td>{{  mediaInfo.getGenre()  }}</td></tr>
 
                 <tr><td colspan="2"><h4>Общее</h4></td></tr>
-                <tr><td>MIME-type:</td>     <td>{{  mediaInfo.mime_type  }}</td></tr>
-                <tr><td>Длина:</td>         <td>{{  mediaInfo.playtime_string  }}</td></tr>
+                <tr><td>Длина:</td>         <td>{{  mediaInfo.getSonglength()  }}</td></tr>
 
                 <tr><td colspan="2"><h4>Аудио</h4></td></tr>
-                <tr><td>Битрейт аудио:</td>             <td>{{  mediaInfo.bitrate  }}</td></tr>
-                <tr><td>Частота дискретизации:</td>     <td>{{  mediaInfo.sample_rate  }}</td></tr>
-                <tr><td>Количество каналов аудио:</td>  <td>{{  mediaInfo.channels  }}</td></tr>
-                <tr><td>Кодек:</td>                     <td>{{  mediaInfo.dataformat  }}</td></tr>
+                <tr><td>Битрейт аудио:</td>             <td>{{  mediaInfo.getOverallBitrate()  }}</td></tr>
+                <tr><td>Частота дискретизации:</td>     <td>{{  mediaInfo.getAudioFrequency()  }}</td></tr>
+                <tr><td>Количество каналов аудио:</td>  <td>{{  mediaInfo.getChannelsCount()  }}</td></tr>
+                <tr><td>Кодек:</td>                     <td>{{  mediaInfo.getFileType()  }}</td></tr>
             </table>
         {% endif %}
 
-        {% if mediaInfo.type == 'video' %}
+        {% if mediaInfo.getTypeInfo() == 'video' %}
             <table class="table table-bordered">
 
                 <tr><td colspan="2"><h4>Общее</h4></td></tr>
-                <tr><td>Длина:</td>     <td>{{  mediaInfo.playtime_seconds  }}</td></tr>
+                <tr><td>Длина:</td>     <td>{{  mediaInfo.getPlayTime()   }}</td></tr>
 
                 <tr><td colspan="2"><h4>Видео</h4></td></tr>
-                <tr><td>Видео формат:</td>      <td>{{  mediaInfo.dataformat  }}</td></tr>
-                <tr><td>Битрейт видео:</td>     <td>{{  mediaInfo.bitrate  }}</td></tr>
-                <tr><td>Ширина:</td>            <td>{{  mediaInfo.resolution_x  }}</td></tr>
-                <tr><td>Высота:</td>            <td>{{  mediaInfo.resolution_y  }}</td></tr>
-                <tr><td>FPS:</td>               <td>{{  mediaInfo.frame_rate  }}</td></tr>
+                <tr><td>Видео формат:</td>      <td>{{  mediaInfo.getFileType()  }}</td></tr>
+                <tr><td>Битрейт видео:</td>     <td>{{  mediaInfo.getOverallBitrate()  }}</td></tr>
+                <tr><td>Ширина:</td>            <td>{{  mediaInfo.getWidth() }}</td></tr>
+                <tr><td>Высота:</td>            <td>{{  mediaInfo.getHeight()  }}</td></tr>
+                <tr><td>FPS:</td>               <td>{{  mediaInfo.getFrameRate()  }}</td></tr>
 
             </table>
         {% endif %}
