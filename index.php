@@ -80,6 +80,7 @@ $app->post('/upload',function () use ($app){
             $file->id = $fileMapper->lastId();
 
             $fileName = $file->getFileNameInOS();
+            
 
             $target = __DIR__ . '/' . $app->config('uploadPath') .  $fileName;
             

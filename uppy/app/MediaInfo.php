@@ -13,7 +13,7 @@ class MediaInfo {
 
 
     function getTypeInfo(){
-        $mime = $this->info['mime_type']; // возвращает mime-тип
+        $mime = isset($this->info['mime_type']) ? $this->info['mime_type'] : ''; // возвращает mime-тип
         if (preg_match('/^audio/',  $mime)){ //если MIME тип 'audio' 
             return 'audio'; //эта функция вернёт информацию о медиа файле
         } elseif (preg_match('/^video/',  $mime)) {

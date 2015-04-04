@@ -19,6 +19,12 @@ class File
         //Меняем кодировку имени, если наша ОС принадлежит семейству виндовс
         
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $regexp = '/[ A-Za-zА-Яа-яЁё\d+-\.,!@#$%^&();=#№[\]_]/u';
+
+            preg_match_all($regexp, $fileName, $allowedWord);
+
+            $fileName = implode("", $allowedWord['0']);
+
             return iconv("UTF-8", "CP1251", $fileName);
         } else {
             return $fileName;
