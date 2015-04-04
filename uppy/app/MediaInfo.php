@@ -1,14 +1,11 @@
 <?php
 namespace Uppy;
 /**
-* Class for extracting information from media files with getID3().
+* Класс для извлечения иформации getID3().
 */
 
 class MediaInfo {
 
-    /**
-    * Private variables
-    */
     public $info   = NULL;
 
 
@@ -23,10 +20,6 @@ class MediaInfo {
         }
     }
 
-    /**
-    * Extract information
-    *
-    */
 
     public function getTitle() {
         return (isset($this->info['id3v1']['title']) ? $this->info['id3v1']['title'] : '');
