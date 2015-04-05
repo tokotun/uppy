@@ -21,19 +21,21 @@ $app = new \Slim\Slim(array(
     'templates.path' => 'uppy/templates/'
     
 ));
+$app->container->singleton('pdo', function() use ($app){
+    $dbc = 'mysql:host=' . $app->config('dbHost') . ';dbname=' . $app->config('dbName');
+    $options = array( PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8' ); 
+    $pdo = new PDO($dbc, $app->config('dbUser'), $app->config('dbPassword'), $options);
+
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    return $pdo;
+});
 
 $app->container->singleton('fileMapper', function() use ($app){
-    $dbc = 'mysql:host=' . $app->config('dbHost') . ';dbname=' . $app->config('dbName');
-    $pdo = new PDO($dbc, $app->config('dbUser'), $app->config('dbPassword'));
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    return new \Uppy\FileMapper($pdo);
+    return new \Uppy\FileMapper($app->pdo); // $app->pdo вызывается через синглтон
 });
 
 $app->container->singleton('commentsMapper', function() use ($app){
-    $dbc = 'mysql:host=' . $app->config('dbHost') . ';dbname=' . $app->config('dbName');
-    $pdo = new PDO($dbc, $app->config('dbUser'), $app->config('dbPassword'));
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    return new \Uppy\CommentsMapper($pdo);
+    return new \Uppy\CommentsMapper($app->pdo); // $app->pdo вызывается через синглтон
 });
 
 $app->container->singleton('getID3', function() use ($app){
@@ -159,6 +161,7 @@ $app->get('/download/:key/:name', function ($key) use ($app){
 
     $fileMapper = $app->fileMapper;
     $file = $fileMapper->loadFile($key);
+
     fileForceDownload($file, $app->config('uploadPath'));
 });
 

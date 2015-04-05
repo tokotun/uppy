@@ -36,6 +36,16 @@ class File
     */
     public function getSavedName()
     {
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $fileName = $this->name;
+            
+            $regexp = "/[^ A-Za-zА-Яа-яЁё\d+-\.,!@#$%^&();=#№[\]_]/u";
+
+            $fileName = preg_replace($regexp  , "_", $fileName);
+            
+            return "$this->id _ $fileName _";
+        }
+
         return "$this->id _ $this->name _";
     }
 
