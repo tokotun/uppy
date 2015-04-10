@@ -2,33 +2,27 @@
 namespace Uppy;
 Class Uploader
 {
+    public $uploadPath;
 
-    public static function createFile(\Uppy\ErrorLoad $errorLoad)
+    public function __construct($uploadPath)
+    {
+        $this->uploadPath = $uploadPath;       
+    }
+
+    public function createFile()
     {
         $file = new \Uppy\File;
-        if ($errorLoad->getError() == false) {
-            $file->name = $_FILES['file']['name'];
-            $file->size = $_FILES['file']['size'];
-            $file->tmpName= $_FILES['file']['tmp_name'];
-            $file->key = $file->generateKey();
-            $file->dateLoad = time();
-        }
+        $file->name = $_FILES['file']['name'];
+        $file->size = $_FILES['file']['size'];
+        $file->tmpName= $_FILES['file']['tmp_name'];
+        $file->key = $file->generateKey();
+        $file->dateLoad = time();
+
         return $file;
     }
 
-    public static function createComment()
-    {
-        if (($_POST['comment']) <> '')  {
-            $comment = new \Uppy\Comment;
-            $comment->message= $_POST['comment'];
-            $comment->dateLoad = time();
-            return $comment;
-        }
-        return false;
-    }
 
-
-    public static function resizeImage($filename, $uploadPath, $maxSize = 200)
+    public function resizeImage($filename, $uploadPath, $maxSize = 200)
     {
         $path = $uploadPath . $filename;
         list($width, $height) = getimagesize($path);
@@ -55,11 +49,30 @@ Class Uploader
     }
 
 
-    public static function getIdParentComment(){
+    public function getIdParentComment(){
         if (isset($_POST['id_comment'])){
             return $_POST['id_comment'];
         } else {
             return false;
         }
+    }
+
+    public function validateLoadFile($maxFileSize)
+    {
+        $errorLoad = new \Uppy\ErrorLoad;
+        if (isset($_FILES)){
+            $errorLoad->setError($_FILES['file']['error']);
+            $errorLoad->setErrorSize($_FILES['file']['size'], $maxFileSize);
+        }
+        return $errorLoad;
+    }
+
+    public function isImage(\Uppy\File $file){
+        $path = $this->uploadPath . $file->getFileNameInOS();
+        if ((is_file($path)) and (getimagesize($path))) {
+            return true;
+        } else {
+            return false;
+        }    
     }
 }

@@ -16,6 +16,5 @@ class Comment
         $parentPath = $commentsMapper->getCommentPaths($idParentComment);
         
         $this->path = $commentsMapper->getNewCommentPath($parentPath, $this->fileId);
-
     }
 }

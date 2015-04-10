@@ -10,7 +10,7 @@ class FileMapper
     }
 
 
-    public function lastId()
+    public function getLastId()
     {
         $sql = "SELECT MAX(`id`) FROM `files`";
         $statment = $this->db->prepare($sql);

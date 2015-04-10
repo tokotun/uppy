@@ -4,22 +4,22 @@ mb_internal_encoding("utf-8");
 require 'vendor/autoload.php';
 
 require 'uppy/app/functions.php';
+require 'uppy/app/config.php';
 
 $twigView = new \Slim\Views\Twig();
 
 // Slim
 $app = new \Slim\Slim(array(
     'dirHost' => __DIR__,
-    'uploadPath' => 'uppy/container/', //путь к папке с хранимыми файлами
-    'maxFileSize' => 33554432,      // 32 MB . Максимальный размер принимаемых файлов.
-    'hostName' => 'http://localhost/uppy',  
-    'dbHost' => 'localhost', //имя базы данных
-    'dbUser' => 'root',      //имя пользователя базы данных
-    'dbPassword' => 'root',  //пароль к базе данных
-    'dbName' => 'uppy',      //имя базы данных
+    'uploadPath' => $uploadPath, //путь к папке с хранимыми файлами
+    'maxFileSize' => $maxFileSize,      // 8 MB . Максимальный размер принимаемых файлов.
+    'hostName' => $hostName,  
+    'dbHost' => $dbHost, //имя базы данных
+    'dbUser' => $dbUser,      //имя пользователя базы данных
+    'dbPassword' => $dbPassword,  //пароль к базе данных
+    'dbName' => $dbName,      //имя базы данных
     'view' => $twigView,
-    'templates.path' => 'uppy/templates/'
-    
+    'templates.path' => $templatesPath
 ));
 $app->container->singleton('pdo', function() use ($app){
     $dbc = 'mysql:host=' . $app->config('dbHost') . ';dbname=' . $app->config('dbName');
@@ -36,6 +36,10 @@ $app->container->singleton('fileMapper', function() use ($app){
 
 $app->container->singleton('commentsMapper', function() use ($app){
     return new \Uppy\CommentsMapper($app->pdo); // $app->pdo вызывается через синглтон
+});
+
+$app->container->singleton('uploader', function() use ($app){
+    return new \Uppy\Uploader($app->config('uploadPath'));
 });
 
 $app->container->singleton('getID3', function() use ($app){
@@ -70,39 +74,37 @@ $app->get('/upload', function () use ($app){
 });
 
 $app->post('/upload',function () use ($app){
-        
+    $uploader = $app->uploader;
     $fileMapper = $app->fileMapper;
     $maxFileSize = $app->config('maxFileSize');
-    $errorLoad = \Uppy\ErrorLoad::validateLoadFile($maxFileSize);
-    $file = \Uppy\Uploader::createFile($errorLoad);
+    $errorLoad = $uploader->validateLoadFile($maxFileSize);
+
     
-    if (isset($_POST['submit'])) {
-        if ($errorLoad->getError() == false)
-        {
-            $file->id = $fileMapper->lastId();
+    if (isset($_POST['submit']) and ($errorLoad->getError() == false)) {
+        $file = $uploader->createFile();
 
-            $fileName = $file->getFileNameInOS();
+        $file->id = $fileMapper->getLastId();
+
+        $fileName = $file->getFileNameInOS();
             
 
-            $target = __DIR__ . '/' . $app->config('uploadPath') .  $fileName;
+        $target = __DIR__ . '/' . $app->config('uploadPath') .  $fileName;
             
-            if (move_uploaded_file($file->tmpName, $target)) {
-                $fileMapper->saveFile($file);
+        if (move_uploaded_file($file->tmpName, $target)) {
+            $fileMapper->saveFile($file);
 
-                
-                if (getimagesize($app->config('uploadPath') . $fileName)){
+            if ($uploader->isImage($file)){
                     
-                    \Uppy\Uploader::resizeImage($fileName, $app->config('uploadPath'));
-                }
+                $uploader->resizeImage($fileName, $app->config('uploadPath'));
             }
-            header("Location: $file->key");
-            die();
         }
+
+        $app->response->redirect("$file->key", 301);
+        
     }
     $app->render('upload.html.twig', array( 
         'hostName' => $app->config('hostName'), 
-        'errorSize' => $errorLoad->errorSize,
-        'errorUpload' => $errorLoad->errorUpload)
+        'errorLoad' => $errorLoad )
     );
 });
 
@@ -128,7 +130,6 @@ $app->get('/:key', function ($key) use ($app){
     $getID3 = $app->getID3;
     $mediaInfo = new \Uppy\MediaInfo();
     $mediaInfo->info = $getID3->analyze($filePath);
-    
     //-------------------------------------------------------
     $app->render('download.html.twig', 
         array('file' => $file, 
@@ -139,22 +140,30 @@ $app->get('/:key', function ($key) use ($app){
 });
 
 $app->post('/:key', function ($key) use ($app){
+    $uploader = $app->uploader;
     $fileMapper = $app->fileMapper;
     $commentsMapper = $app->commentsMapper;
-    $newComment = \Uppy\Uploader::createComment();
+
+    
+    if ($app->request->post('comment') <> '')  {
+            $newComment = new \Uppy\Comment;
+            $newComment->message= $app->request->post('comment');
+            $newComment->dateLoad = time();
+    } else {
+        $newComment = false;
+    }
 
     //если создан коментарий, то продолжаем заносить его в базу
     if ($newComment){
         $newComment->fileId = $fileMapper->getId($key);
-        $idParentComment = \Uppy\Uploader::getIdParentComment();
+        $idParentComment = $uploader->getIdParentComment();
 
         $newComment->getNewPathComment($commentsMapper, $idParentComment);
         
         $commentsMapper->saveComment($newComment);
     }
-
-    header("Location: $key");
-    die();
+    $app->response->redirect("$key", 301);
+ 
 });
 
 $app->get('/download/:key/:name', function ($key) use ($app){

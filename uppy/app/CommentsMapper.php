@@ -22,11 +22,10 @@ class CommentsMapper
         }
 
         $comments = array();
-        $regexp = '/\./u';
         foreach ($result as $r) {
             $comment = new \Uppy\Comment;
             $comment->id = $r['id'];
-            $comment->path = preg_split($regexp, $r['comment_path']); //разбивание пути типа 1.3.1 на отдельные элементы массива
+            $comment->path = $this->strToArr($r['comment_path']); 
             $comment->message = $r['message'];
             $comment->dateLoad = $r['date_comment'];
             $comments[] = $comment;
@@ -69,14 +68,22 @@ class CommentsMapper
             $statment->bindValue(':parent_path', $parentPath);
             $statment->execute();
             $result = $statment->fetch(\PDO::FETCH_ASSOC);
+
+            
             if (!$result) {
-                return $parentPath . '.' . '1';
+                $newCommentPath = $this->strToArr($parentPath);
+                $newCommentPath[] = '001';
+                return $newCommentPath;
             }
-            //извлекает последнюю цифру из строки  (из 2.1.13 извлекет 13)
-            preg_match('/\d+$/u', $result['comment_path'], $n); 
-            $numberChildComment = $n['0'] + 1;
-            //родительский путь сложится с дочерним. Получится путь для нового коментария.
-            $newCommentPath = $parentPath . '.' .$numberChildComment; 
+            
+            //преобразуем текстовый путь родительского комметария в массив
+            $newCommentPath = $this->strToArr($parentPath);
+
+            //текстовый путь одного из потомков
+            $r = $this->strToArr($result['comment_path']);
+            
+            $newCommentPath[] = $r[count($newCommentPath)] + 1;
+            
         } else {
 
             //если не дан путь родительского коментария, то пытаемся создать новый родительский комментрарий
@@ -88,24 +95,45 @@ class CommentsMapper
             $result = $statment->fetch(\PDO::FETCH_ASSOC);
 
             if (!$result) {
-                return '1';
+                return array('001');
             }
-            //извлекает первую цифру из строки  (из 2.1.13 извлекет 2)
-            preg_match('/^\d+/u', $result['comment_path'], $n); 
-            $newCommentPath = $n['0'] + 1;
+            //В пути 002.001.013  берётся первый элемент. И увеличивается на 1)
+            $newCommentPath = $this->strToArr($parentPath);
+            $newCommentPath = array( $newCommentPath[0] + 1 ); 
         }
-
+        
         return $newCommentPath;
     }
 
     public function saveComment(\Uppy\Comment $comment)
-    {
+    {   
+        
+        $path = $this->arrToStr($comment->path);
+
         $sql = "INSERT INTO comments VALUES (NULL, :file_id, :comment_path, :message,  FROM_UNIXTIME(:date_comment))";
         $statment = $this->db->prepare($sql);
         $statment->bindValue(':file_id', $comment->fileId);
-        $statment->bindValue(':comment_path', $comment->path);
+        $statment->bindValue(':comment_path', $path);
         $statment->bindValue(':message', $comment->message);
         $statment->bindValue(':date_comment', $comment->dateLoad);
         $statment->execute();
+    }
+
+    public function strToArr($path){
+        
+        $path = explode(".", $path);
+        
+        foreach ($path as $key => $value) {
+            $path[$key] = sprintf('%03u', $path[$key]);
+        }
+
+        return $path;
+    }
+
+    public function arrToStr($path){
+        foreach ($path as $key => $value) {
+            $path[$key] = sprintf('%03u', $path[$key]);
+        }
+        return implode(".", $path);
     }
 }
