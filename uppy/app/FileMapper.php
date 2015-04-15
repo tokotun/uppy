@@ -15,8 +15,8 @@ class FileMapper
         $sql = "SELECT MAX(`id`) FROM `files`";
         $statment = $this->db->prepare($sql);
         $statment->execute();
-        $result = $statment->fetch();
-        return ($result['0'] + 1);
+        $result = $statment->fetchColumn();
+        return ($result + 1);
     }
 
     public function saveFile(\Uppy\File $file, $jsonID3)
@@ -45,9 +45,9 @@ class FileMapper
         $statment = $this->db->prepare($sql);
         $statment->bindValue(':file_key', $key);
         $statment->execute();
-        $result = $statment->fetch(\PDO::FETCH_ASSOC);
+        $result = $statment->fetchColumn();
 
-        return $result['id'];
+        return $result;
     }
 
     public function getFiles()

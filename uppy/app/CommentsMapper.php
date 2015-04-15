@@ -45,13 +45,13 @@ class CommentsMapper
         $statment = $this->db->prepare($sql);
         $statment->bindValue(':id', $idComment);
         $statment->execute();
-        $result = $statment->fetch(\PDO::FETCH_ASSOC);
+        $result = $statment->fetchColumn();;
 
         if (!$result) {
             return false;
         }
 
-        return $result['comment_path'];
+        return $result;
     }
 
     public function getNewCommentPath($parentPath, $fileId)
@@ -59,16 +59,15 @@ class CommentsMapper
         if ($parentPath) 
         {
             //если дан путь родительского коментария, то пытаемся создать путь для нового дочернего
-            $sql = "SELECT `comment_path` FROM comments WHERE file_id = :file_id AND
+            $sql = "SELECT MAX(`comment_path`) FROM comments WHERE file_id = :file_id AND
             `comment_path` LIKE :comment_path AND
-            `comment_path` <> :parent_path ORDER BY `comment_path` DESC LIMIT 1";
+            `comment_path` <> :parent_path";
             $statment = $this->db->prepare($sql);
             $statment->bindValue(':file_id', $fileId);
             $statment->bindValue(':comment_path', $parentPath . '%');
             $statment->bindValue(':parent_path', $parentPath);
             $statment->execute();
-            $result = $statment->fetch(\PDO::FETCH_ASSOC);
-
+            $result = $statment->fetchColumn();
             if (!$result) {
                 $newCommentPath = $this->strToArr($parentPath);
                 $newCommentPath[] = '001';
@@ -79,7 +78,7 @@ class CommentsMapper
             $newCommentPath = $this->strToArr($parentPath);
 
             //текстовый путь одного из потомков
-            $r = $this->strToArr($result['comment_path']);
+            $r = $this->strToArr($result);
             
             $newCommentPath[] = $r[count($newCommentPath)] + 1;
             
@@ -91,14 +90,14 @@ class CommentsMapper
             $statment = $this->db->prepare($sql);
             $statment->bindValue(':file_id', $fileId);
             $statment->execute();
-            $result = $statment->fetch(\PDO::FETCH_ASSOC);
+            $result = $statment->fetchColumn();
 
             if (!$result) {
                 return array('001');
             }
             //В пути 002.001.013  берётся первый элемент. И увеличивается на 1)
             
-            $newCommentPath = $this->strToArr($result['comment_path']);
+            $newCommentPath = $this->strToArr($result);
             
             $newCommentPath = array( $newCommentPath[0] + 1 ); 
         }
