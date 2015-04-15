@@ -2,8 +2,15 @@
 namespace Uppy;
 Class ErrorLoad
 {
-    protected $error = true;
-    public $errorSize = '';
+    protected $error;
+    protected $errorSize;
+
+    public function __construct()
+    {
+        $this->error = true;
+        $this->errorSize = '';
+    }
+
 
     public function getError()
     {

@@ -6,20 +6,53 @@ namespace Uppy;
 
 class MediaInfo {
 
-    public $info   = NULL;
+    protected $info;
 
+    public function __construct(array $ID3)
+    {
+        if (isset($ID3['mime_type'])){
+            $this->info['mime_type'] = isset($ID3['mime_type']) ? $ID3['mime_type'] : '';
+        } else {
+            $this->info = null;
+        }
+
+        if ($this->getTypeInfo() == 'audio'){
+            $this->info['id3v1']['genre']       = isset($ID3['id3v1']['genre'])       ? $ID3['id3v1']['genre']       : '';
+            $this->info['id3v1']['album']       = isset($ID3['id3v1']['album'])       ? $ID3['id3v1']['album']       : '';
+            $this->info['id3v1']['comment']     = isset($ID3['id3v1']['comment'])     ? $ID3['id3v1']['comment']     : '';
+            $this->info['id3v1']['year']        = isset($ID3['id3v1']['year'])        ? $ID3['id3v1']['year']        : '';
+            $this->info['audio']['channels']    = isset($ID3['audio']['channels'])    ? $ID3['audio']['channels']    : '';
+            $this->info['id3v1']['artist']      = isset($ID3['id3v1']['artist'])      ? $ID3['id3v1']['artist']      : '';
+            $this->info['audio']['sample_rate'] = isset($ID3['audio']['sample_rate']) ? $ID3['audio']['sample_rate'] : '';
+            $this->info['bitrate']              = isset($ID3['bitrate'])              ? $ID3['bitrate']              : '';
+            $this->info['playtime_string']      = isset($ID3['playtime_string'])      ? $ID3['playtime_string']      : '';
+            $this->info['fileformat']           = isset($ID3['fileformat'])           ? $ID3['fileformat']           : '';
+            $this->info['id3v1']['title']       = isset($ID3['id3v1']['title'])       ? $ID3['id3v1']['title']       : '';
+        }
+
+        if ($this->getTypeInfo() == 'video'){
+            $this->info['video']['resolution_x'] = isset($ID3['video']['resolution_x']) ? $ID3['video']['resolution_x'] : '';
+            $this->info['video']['resolution_y'] = isset($ID3['video']['resolution_y']) ? $ID3['video']['resolution_y'] : '';
+            $this->info['video']['frame_rate']   = isset($ID3['video']['frame_rate'])   ? $ID3['video']['frame_rate']   : '';
+            $this->info['bitrate']               = isset($ID3['bitrate'])               ? $ID3['bitrate']               : '';
+            $this->info['fileformat']            = isset($ID3['fileformat'])            ? $ID3['fileformat']            : '';
+        }
+    }
 
     function getTypeInfo(){
-        $mime = isset($this->info['mime_type']) ? $this->info['mime_type'] : ''; // возвращает mime-тип
+        $mime = isset($this->info['mime_type']) ? $this->info['mime_type'] : '';
         if (preg_match('/^audio/',  $mime)){ //если MIME тип 'audio' 
-            return 'audio'; //эта функция вернёт информацию о медиа файле
-        } elseif (preg_match('/^video/',  $mime)) {
-            return 'video'; //эта функция вернёт информацию о медиа файле
+            return 'audio';
+        } elseif (preg_match('/^video/',  $mime)) {//если MIME тип 'video' 
+            return 'video'; 
         } else {
             return false;
         }
     }
 
+    public function getInfoJson(){
+        return json_encode($this->info);
+    }
 
     public function getTitle() {
         return (isset($this->info['id3v1']['title']) ? $this->info['id3v1']['title'] : '');

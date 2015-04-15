@@ -69,7 +69,6 @@ class CommentsMapper
             $statment->execute();
             $result = $statment->fetch(\PDO::FETCH_ASSOC);
 
-            
             if (!$result) {
                 $newCommentPath = $this->strToArr($parentPath);
                 $newCommentPath[] = '001';
@@ -98,7 +97,9 @@ class CommentsMapper
                 return array('001');
             }
             //В пути 002.001.013  берётся первый элемент. И увеличивается на 1)
-            $newCommentPath = $this->strToArr($parentPath);
+            
+            $newCommentPath = $this->strToArr($result['comment_path']);
+            
             $newCommentPath = array( $newCommentPath[0] + 1 ); 
         }
         

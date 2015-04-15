@@ -19,14 +19,23 @@ class FileMapper
         return ($result['0'] + 1);
     }
 
-    public function saveFile(\Uppy\File $file)
+    public function saveFile(\Uppy\File $file, $jsonID3)
     {
+
         $sql = "INSERT INTO files VALUES (NULL, :name, :file_key, FROM_UNIXTIME(:dateLoad), :size)";
         $statment = $this->db->prepare($sql);
         $statment->bindValue(':name', $file->name);
         $statment->bindValue(':file_key', $file->key);
         $statment->bindValue(':dateLoad', $file->dateLoad);
         $statment->bindValue(':size', $file->size);
+        $statment->execute();
+
+        $lastId = $this->db->lastInsertId();
+
+        $sql = "INSERT INTO file_info VALUES (NULL, :file_id, :ID3)";
+        $statment = $this->db->prepare($sql);
+        $statment->bindValue(':file_id', $lastId);
+        $statment->bindValue(':ID3', $jsonID3);
         $statment->execute();
     }
 
@@ -68,7 +77,7 @@ class FileMapper
         $statment->bindValue(':file_key', $key);
         $statment->execute();
         $result = $statment->fetch(\PDO::FETCH_ASSOC);
-
+        
         if (!$result) {
             return false;
         }

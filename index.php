@@ -38,6 +38,10 @@ $app->container->singleton('commentsMapper', function() use ($app){
     return new \Uppy\CommentsMapper($app->pdo); // $app->pdo вызывается через синглтон
 });
 
+$app->container->singleton('mediaInfoMapper', function() use ($app){
+    return new \Uppy\MediaInfoMapper($app->pdo); // $app->pdo вызывается через синглтон
+});
+
 $app->container->singleton('uploader', function() use ($app){
     return new \Uppy\Uploader($app->config('uploadPath'));
 });
@@ -91,8 +95,15 @@ $app->post('/upload',function () use ($app){
         $target = __DIR__ . '/' . $app->config('uploadPath') .  $fileName;
             
         if (move_uploaded_file($file->tmpName, $target)) {
-            $fileMapper->saveFile($file);
+            //Извлечение метаданных с помощью getID3()
+            $getID3 = $app->getID3;
+            $ID3 = $getID3->analyze($target);
 
+            $mediaInfo = new \Uppy\MediaInfo($ID3);
+            $jsonID3 = $mediaInfo->getInfoJson();
+            //сохранение файла
+            $fileMapper->saveFile($file, $jsonID3);
+            
             if ($uploader->isImage($file)){
                     
                 $uploader->resizeImage($fileName, $app->config('uploadPath'));
@@ -121,22 +132,25 @@ $app->get('/:key', function ($key) use ($app){
 
     $fileMapper = $app->fileMapper;
     $commentsMapper = $app->commentsMapper;
+    $mediaInfoMapper = $app->mediaInfoMapper;
     $file = $fileMapper->loadFile($key);
-    $comments = $commentsMapper->loadComments($file->id);
 
-    //-------------------------------------------------------
-    //Извлечение метаданных с помощью getID3()
-    $filePath = 'uppy/container/' . $fileName = $file->getFileNameInOS(); 
-    $getID3 = $app->getID3;
-    $mediaInfo = new \Uppy\MediaInfo();
-    $mediaInfo->info = $getID3->analyze($filePath);
-    //-------------------------------------------------------
-    $app->render('download.html.twig', 
-        array('file' => $file, 
-            'comments' => $comments, 
-            'hostName' => $app->config('hostName'), 
-            'mediaInfo' => $mediaInfo)
-    );
+    if ($file) {
+        $fileId = $fileMapper->getId($key);
+        $comments = $commentsMapper->loadComments($file->id);
+        
+        $mediaInfo = $mediaInfoMapper->loadMediaInfo($fileId);
+        $app->render('download.html.twig', 
+            array('file' => $file, 
+                'comments' => $comments, 
+                'hostName' => $app->config('hostName'), 
+                'mediaInfo' => $mediaInfo)
+        );
+    } else {
+        $app->render('notFoundFile.html.twig', array( 'hostName' => $app->config('hostName') ) );
+    }
+
+
 });
 
 $app->post('/:key', function ($key) use ($app){
@@ -159,7 +173,7 @@ $app->post('/:key', function ($key) use ($app){
         $idParentComment = $uploader->getIdParentComment();
 
         $newComment->getNewPathComment($commentsMapper, $idParentComment);
-        
+
         $commentsMapper->saveComment($newComment);
     }
     $app->response->redirect("$key", 301);
