@@ -64,17 +64,21 @@ $view->parserOptions = array(
 $view->parserExtensions = array(
     new \Slim\Views\TwigExtension(),
 );
+//В каждом шаблоне будет находится имя хоста
+$view->setData( 
+        array( 'hostName' => $app->config('hostName') )
+);
 
 $app->get('/hello/:name', function ($name) {
     echo "Hello, $name";
 });
 
 $app->get('/', function () use ($app){
-    $app->render('upload.html.twig', array( 'hostName' => $app->config('hostName')));
+    $app->render('upload.html.twig', array());
 });
 
 $app->get('/upload', function () use ($app){
-    $app->render('upload.html.twig', array( 'hostName' => $app->config('hostName')));
+    $app->render('upload.html.twig', array());
 });
 
 $app->post('/upload',function () use ($app){
@@ -114,7 +118,6 @@ $app->post('/upload',function () use ($app){
         
     }
     $app->render('upload.html.twig', array( 
-        'hostName' => $app->config('hostName'), 
         'errorLoad' => $errorLoad )
     );
 });
@@ -123,8 +126,7 @@ $app->get('/main', function () use ($app){
     $fileMapper = $app->fileMapper;
     $files = $fileMapper->getFiles();
     $app->render('main.html.twig', array(
-        'files' => $files, 
-        'hostName' => $app->config('hostName'))
+        'files' => $files)
     );
 });
 
@@ -143,11 +145,10 @@ $app->get('/:key', function ($key) use ($app){
         $app->render('download.html.twig', 
             array('file' => $file, 
                 'comments' => $comments, 
-                'hostName' => $app->config('hostName'), 
                 'mediaInfo' => $mediaInfo)
         );
     } else {
-        $app->render('notFoundFile.html.twig', array( 'hostName' => $app->config('hostName') ) );
+        $app->render('notFoundFile.html.twig', array() );
     }
 
 
