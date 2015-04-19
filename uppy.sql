@@ -1,3 +1,6 @@
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
 CREATE TABLE `files` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(150) NOT NULL,
@@ -11,24 +14,21 @@ CREATE TABLE `files` (
 CREATE TABLE `comments` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `file_id` int(11) NOT NULL,
-  `comment_path` varchar(40) NOT NULL,
+  `comment_path` varchar(40) DEFAULT NULL COMMENT 'Description branches for comment. Number of comments and the number of his parents.',
   `message` text NOT NULL,
   `date_comment` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `file_comment` (`file_id`,`comment_path`),
-  KEY `file_id` (`file_id`),
   FOREIGN KEY (`file_id`) REFERENCES `files` (`id`) 
-	ON UPDATE CASCADE 
-	ON DELETE RESTRICT
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+      ON DELETE CASCADE 
+      ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `file_info` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
   `file_id` int(11) NOT NULL,
-  `ID3` text,
-  PRIMARY KEY (`id`),
-  KEY `file_id` (`file_id`),
+  `ID3` text COMMENT 'ID3 information in JSON format',
+  PRIMARY KEY (`file_id`),
   FOREIGN KEY (`file_id`) REFERENCES `files` (`id`) 
-	ON UPDATE CASCADE 
-	ON DELETE RESTRICT
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+      ON DELETE CASCADE 
+      ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

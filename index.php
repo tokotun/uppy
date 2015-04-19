@@ -68,6 +68,9 @@ $view->parserExtensions = array(
 $view->setData( 
         array( 'hostName' => $app->config('hostName') )
 );
+$app->notFound(function () use ($app) {
+    $app->render('notFoundFile.html.twig', array() );
+});
 
 $app->get('/hello/:name', function ($name) {
     echo "Hello, $name";
@@ -148,7 +151,7 @@ $app->get('/:key', function ($key) use ($app){
                 'mediaInfo' => $mediaInfo)
         );
     } else {
-        $app->render('notFoundFile.html.twig', array() );
+        $app->notFound();
     }
 
 
@@ -188,5 +191,6 @@ $app->get('/download/:key/:name', function ($key) use ($app){
 
     fileForceDownload($file, $app->config('uploadPath'));
 });
+
 
 $app->run();
