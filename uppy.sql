@@ -1,12 +1,10 @@
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
-
 CREATE TABLE `files` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(150) NOT NULL,
   `file_key` varchar(10) NOT NULL,
   `dateLoad` datetime NOT NULL,
   `size` int(8) NOT NULL,
+  `ID3` text COMMENT 'ID3 information in JSON format',
   PRIMARY KEY (`id`),
   UNIQUE KEY `file_key` (`file_key`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
@@ -19,15 +17,6 @@ CREATE TABLE `comments` (
   `date_comment` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `file_comment` (`file_id`,`comment_path`),
-  FOREIGN KEY (`file_id`) REFERENCES `files` (`id`) 
-      ON DELETE CASCADE 
-      ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE `file_info` (
-  `file_id` int(11) NOT NULL,
-  `ID3` text COMMENT 'ID3 information in JSON format',
-  PRIMARY KEY (`file_id`),
   FOREIGN KEY (`file_id`) REFERENCES `files` (`id`) 
       ON DELETE CASCADE 
       ON UPDATE CASCADE

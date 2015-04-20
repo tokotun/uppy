@@ -19,23 +19,15 @@ class FileMapper
         return ($result + 1);
     }
 
-    public function saveFile(\Uppy\File $file, $jsonID3)
+    public function saveFile(\Uppy\File $file)
     {
-
-        $sql = "INSERT INTO files VALUES (NULL, :name, :file_key, FROM_UNIXTIME(:dateLoad), :size)";
+        $sql = "INSERT INTO files VALUES (NULL, :name, :file_key, FROM_UNIXTIME(:dateLoad), :size, :ID3)";
         $statment = $this->db->prepare($sql);
         $statment->bindValue(':name', $file->name);
         $statment->bindValue(':file_key', $file->key);
         $statment->bindValue(':dateLoad', $file->dateLoad);
         $statment->bindValue(':size', $file->size);
-        $statment->execute();
-
-        $lastId = $this->db->lastInsertId();
-
-        $sql = "INSERT INTO file_info VALUES (NULL, :file_id, :ID3)";
-        $statment = $this->db->prepare($sql);
-        $statment->bindValue(':file_id', $lastId);
-        $statment->bindValue(':ID3', $jsonID3);
+        $statment->bindValue(':ID3', $file->getInfoJson());
         $statment->execute();
     }
 
@@ -69,7 +61,6 @@ class FileMapper
         return $files;
     }
 
-
     public function loadFile($key)
     {
         $sql = "SELECT *  FROM files WHERE `file_key`=:file_key";
@@ -81,12 +72,15 @@ class FileMapper
         if (!$result) {
             return false;
         }
+
         $file = new \Uppy\File;
         $file->id = $result['id'];
         $file->name = $result['name'];
         $file->size = $result['size'];
         $file->key = $result['file_key'];
         $file->dateLoad = strtotime($result['dateLoad']);
+        $file->moveJsonInfoInFile($result['ID3']);
+        
         return $file;
     }
 }

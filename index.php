@@ -38,10 +38,6 @@ $app->container->singleton('commentsMapper', function() use ($app){
     return new \Uppy\CommentsMapper($app->pdo); // $app->pdo вызывается через синглтон
 });
 
-$app->container->singleton('mediaInfoMapper', function() use ($app){
-    return new \Uppy\MediaInfoMapper($app->pdo); // $app->pdo вызывается через синглтон
-});
-
 $app->container->singleton('uploader', function() use ($app){
     return new \Uppy\Uploader($app->config('uploadPath'));
 });
@@ -105,19 +101,17 @@ $app->post('/upload',function () use ($app){
             //Извлечение метаданных с помощью getID3()
             $getID3 = $app->getID3;
             $ID3 = $getID3->analyze($target);
-
-            $mediaInfo = new \Uppy\MediaInfo($ID3);
-            $jsonID3 = $mediaInfo->getInfoJson();
+            $file->moveArrayInfoInFile($ID3);
             //сохранение файла
-            $fileMapper->saveFile($file, $jsonID3);
-            
+            $fileMapper->saveFile($file);
+
             if ($uploader->isImage($file)){
                     
                 $uploader->resizeImage($fileName, $app->config('uploadPath'));
             }
         }
 
-        $app->response->redirect("$file->key", 301);
+        $app->response->redirect("file/$file->key", 301);
         
     }
     $app->render('upload.html.twig', array( 
@@ -133,22 +127,18 @@ $app->get('/main', function () use ($app){
     );
 });
 
-$app->get('/:key', function ($key) use ($app){
+$app->get('/file/:key', function ($key) use ($app){
 
     $fileMapper = $app->fileMapper;
     $commentsMapper = $app->commentsMapper;
-    $mediaInfoMapper = $app->mediaInfoMapper;
     $file = $fileMapper->loadFile($key);
 
     if ($file) {
-        $fileId = $fileMapper->getId($key);
         $comments = $commentsMapper->loadComments($file->id);
         
-        $mediaInfo = $mediaInfoMapper->loadMediaInfo($fileId);
-        $app->render('download.html.twig', 
-            array('file' => $file, 
-                'comments' => $comments, 
-                'mediaInfo' => $mediaInfo)
+        $app->render('download.html.twig', array(
+            'file' => $file, 
+            'comments' => $comments)
         );
     } else {
         $app->notFound();
@@ -157,7 +147,7 @@ $app->get('/:key', function ($key) use ($app){
 
 });
 
-$app->post('/:key', function ($key) use ($app){
+$app->post('/file/:key', function ($key) use ($app){
     $uploader = $app->uploader;
     $fileMapper = $app->fileMapper;
     $commentsMapper = $app->commentsMapper;
@@ -180,11 +170,11 @@ $app->post('/:key', function ($key) use ($app){
 
         $commentsMapper->saveComment($newComment);
     }
-    $app->response->redirect("$key", 301);
+    $app->response->redirect("file/$key", 301);
  
 });
 
-$app->get('/download/:key/:name', function ($key) use ($app){
+$app->get('/download/file/:key/:name', function ($key) use ($app){
 
     $fileMapper = $app->fileMapper;
     $file = $fileMapper->loadFile($key);

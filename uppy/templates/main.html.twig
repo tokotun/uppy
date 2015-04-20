@@ -11,7 +11,7 @@
         <ul>
             {% for file in files %}
                 <li>
-                <a href="{{ hostName }}/{{ file.key }}" title="{{ file.name }}">{{ file.name }}</a>
+                <a href="{{ hostName }}/file/{{ file.key }}" title="{{ file.name }}">{{ file.name }}</a>
                 <span>{{  file.getSize  }}</span>
                 </li>
             {% endfor %}
