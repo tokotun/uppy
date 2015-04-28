@@ -9,13 +9,17 @@
     <div class="container-fluid">
         <center>
             <form accept-charset="UTF-8" action="{{ hostName }}/upload" enctype="multipart/form-data" method="post">
-            <input name="file" size="50" type="file">
+            <input name="file" size="50" type="file" required placeholder="">
             <input class="btn upload" name="submit" value="Отправить" type="submit">
             </form>
         </center>
         <span class="text-error">{{ errorLoad.getErrorSize() }}</span>
         {% if errorLoad.getError() %}
             <span class="text-error">Sorry, there was a problem uploading your file.</span>
+        {% endif %}
+
+        {% if errorLoad.getErrorMoveFile() %}
+            <span class="text-error">Sorry, there was a problem moving your file.</span>
         {% endif %}
     </div>
 {% endblock %}

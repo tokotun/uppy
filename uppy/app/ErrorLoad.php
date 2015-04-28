@@ -3,11 +3,13 @@ namespace Uppy;
 Class ErrorLoad
 {
     protected $error;
+    protected $errorMoveFile;
     protected $errorSize;
 
     public function __construct()
     {
         $this->error = true;
+        $this->ErrorMoveFile = true;
         $this->errorSize = '';
     }
 
@@ -26,6 +28,11 @@ Class ErrorLoad
         }
     }
 
+    public function setErrorMoveFile(){
+       $this->errorMoveFile = false;
+    }
+
+
     public function setErrorSize($fileSize, $maxFileSize)
     {
         if (($fileSize <= 0) or ($fileSize > $maxFileSize)) {
@@ -34,9 +41,12 @@ Class ErrorLoad
         }
     }
 
+    public function getErrorMoveFile(){
+       return $this->ErrorMoveFile;
+    }
+
     public function getErrorSize()
-    {
-        
+    { 
         return $this->errorSize;
     }
 }

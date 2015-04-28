@@ -2,9 +2,9 @@ CREATE TABLE `files` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(150) NOT NULL,
   `file_key` varchar(10) NOT NULL,
-  `dateLoad` datetime NOT NULL,
+  `date_load` datetime NOT NULL,
   `size` int(8) NOT NULL,
-  `ID3` text COMMENT 'ID3 information in JSON format',
+  `id3` text COMMENT 'ID3 information in JSON format',
   PRIMARY KEY (`id`),
   UNIQUE KEY `file_key` (`file_key`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;

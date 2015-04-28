@@ -2,3 +2,5 @@
 tmp
 forTest
 uppy/container/
+!uppy/container/.htaccess
+!uppy/container/thumbs/.placeholder

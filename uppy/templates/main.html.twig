@@ -6,16 +6,21 @@
 
 {% block content %}
     <div class="container">
-        <h1>Последние файлы</h1>
-        <div class="main-column">   
-        <ul>
-            {% for file in files %}
-                <li>
-                <a href="{{ hostName }}/file/{{ file.key }}" title="{{ file.name }}">{{ file.name }}</a>
-                <span>{{  file.getSize  }}</span>
-                </li>
-            {% endfor %}
-        </ul>
-        </div>
+        {% if listFiles %}
+            <h1>Последние файлы</h1>
+            <div class="main-column">   
+            <ul>
+                {% for file in listFiles %}
+                    <li>
+                        <span>{{  utilHelper.getSize(file.size)  }}</span>
+                        <a href="{{ hostName }}/file/{{ file.key }}" title="{{ file.name }}">{{ file.name }}</a> 
+                    </li>
+                {% endfor %}
+            </ul>
+            </div>
+        {% else %}
+            <h1>Пока ни одного файла не загружено.</h1>
+            <span>Желаете загрузить первый?</span>
+        {% endif %}
     </div>
 {% endblock %}

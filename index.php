@@ -42,6 +42,10 @@ $app->container->singleton('uploader', function() use ($app){
     return new \Uppy\Uploader($app->config('uploadPath'));
 });
 
+$app->container->singleton('utilHelper', function() use ($app){
+    return new \Uppy\UtilHelper($app->config('dirHost'), $app->config('hostName'), $app->config('uploadPath'));
+});
+
 $app->container->singleton('getID3', function() use ($app){
     $getID3 = new \getID3;
     $getID3->option_md5_data        = true;
@@ -64,6 +68,7 @@ $view->parserExtensions = array(
 $view->setData( 
         array( 'hostName' => $app->config('hostName') )
 );
+
 $app->notFound(function () use ($app) {
     $app->render('notFoundFile.html.twig', array() );
 });
@@ -83,68 +88,52 @@ $app->get('/upload', function () use ($app){
 $app->post('/upload',function () use ($app){
     $uploader = $app->uploader;
     $fileMapper = $app->fileMapper;
+    $utilHelper = $app->utilHelper;
     $maxFileSize = $app->config('maxFileSize');
+    $dirHost = $app->config('dirHost');
     $errorLoad = $uploader->validateLoadFile($maxFileSize);
 
-    
     if (isset($_POST['submit']) and ($errorLoad->getError() == false)) {
+
+        $getID3 = $app->getID3;   
         $file = $uploader->createFile();
-
-        $file->id = $fileMapper->getLastId();
-
-        $fileName = $file->getFileNameInOS();
-            
-
-        $target = __DIR__ . '/' . $app->config('uploadPath') .  $fileName;
-            
-        if (move_uploaded_file($file->tmpName, $target)) {
-            //Извлечение метаданных с помощью getID3()
-            $getID3 = $app->getID3;
-            $ID3 = $getID3->analyze($target);
-            $file->moveArrayInfoInFile($ID3);
-            //сохранение файла
-            $fileMapper->saveFile($file);
-
-            if ($uploader->isImage($file)){
-                    
-                $uploader->resizeImage($fileName, $app->config('uploadPath'));
-            }
+    
+        if ($uploader->saveFile($file, $fileMapper, $utilHelper, $getID3)){
+            //$app->response->redirect("file/$file->key", 301);
+        } else {
+            $errorLoad->setErrorMoveFile();
         }
-
-        $app->response->redirect("file/$file->key", 301);
-        
     }
     $app->render('upload.html.twig', array( 
-        'errorLoad' => $errorLoad )
+       'errorLoad' => $errorLoad )
     );
 });
 
 $app->get('/main', function () use ($app){
+    $utilHelper = $app->utilHelper;
     $fileMapper = $app->fileMapper;
-    $files = $fileMapper->getFiles();
+    $listFiles = $fileMapper->getFiles();
     $app->render('main.html.twig', array(
-        'files' => $files)
+        'listFiles' => $listFiles,
+        'utilHelper' => $utilHelper)
     );
 });
 
 $app->get('/file/:key', function ($key) use ($app){
-
     $fileMapper = $app->fileMapper;
     $commentsMapper = $app->commentsMapper;
+    $utilHelper = $app->utilHelper;
     $file = $fileMapper->loadFile($key);
-
     if ($file) {
         $comments = $commentsMapper->loadComments($file->id);
-        
         $app->render('download.html.twig', array(
             'file' => $file, 
-            'comments' => $comments)
+            'comments' => $comments,
+            'utilHelper' => $utilHelper)
         );
     } else {
         $app->notFound();
     }
-
-
 });
 
 $app->post('/file/:key', function ($key) use ($app){
@@ -169,9 +158,9 @@ $app->post('/file/:key', function ($key) use ($app){
         $newComment->getNewPathComment($commentsMapper, $idParentComment);
 
         $commentsMapper->saveComment($newComment);
+        $app->response->redirect("$key", 301);
     }
-    $app->response->redirect("file/$key", 301);
- 
+    $app->response->redirect("$key", 301);
 });
 
 $app->get('/download/file/:key/:name', function ($key) use ($app){

@@ -7,13 +7,13 @@
 {% block content %}
     <div class="container">
         {% if file %}
-            {%  if  file.isImage()   %}
-                <img class="img-polaroid" src="{{ file.getPathThumbs() }}"">
+            {% if  utilHelper.isImage(file) %}
+                <img class="img-polaroid" src="{{ utilHelper.getPathThumbs(file) }}">
             {% endif %}
             <p><strong>Файл</strong> - {{ file.name }}</p>
-            <p>{{ file.getSize() }}</p>
+            <p>{{ utilHelper.getSize(file.size) }}</p>
             <p>{{ file.getDate() }}</p>
-            <a href="{{  file.getDownloadLink( hostName )  }}" title="{{ file.name }}">Скачать</a>
+            <a href="{{ utilHelper.getDownloadLink( file ) }}" title="{{ file.name }}">Скачать</a>
         {% else %}
             <h1>Файл не найден!</h1>
         {% endif %}
@@ -55,12 +55,12 @@
             </table>
         {% endif %}
 
-        <form name="test" method="post" action="{{ hostName }}/{{ file.key }}">
+        <form name="test" method="post" action="{{ hostName }}/file/{{ file.key }}">
 
         {% if comments %}
             <h3>Комментарии</h3>
             {% for comment in comments %}
-                <div id="{{  comment.id  }}" style="margin-left: {{  (comment.path|length - 1) * 25  }}px;">
+                <div id="{{  comment.id  }}" style="margin-left: {{  comment.getDepth()  }}px;">
                     <div><small>{{  comment.dateLoad  }}</small></div>
                     <label class="radio">
                         <input type="radio" name="id_comment" value="{{  comment.id  }}">{{  comment.message  }}

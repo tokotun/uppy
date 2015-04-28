@@ -17,4 +17,9 @@ class Comment
 
         $this->path = $commentsMapper->getNewCommentPath($parentPath, $this->fileId);
     }
+
+    public function getDepth()
+    { 
+        return 25 * (count($this->path) - 1);
+    }
 }

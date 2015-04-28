@@ -60,46 +60,44 @@ class CommentsMapper
         {
             //если дан путь родительского коментария, то пытаемся создать путь для нового дочернего
             $sql = "SELECT MAX(`comment_path`) FROM comments WHERE file_id = :file_id AND
-            `comment_path` LIKE :comment_path AND
-            `comment_path` <> :parent_path";
+            `comment_path` LIKE :comment_path";// AND
+            //`comment_path` <> :parent_path";
             $statment = $this->db->prepare($sql);
             $statment->bindValue(':file_id', $fileId);
-            $statment->bindValue(':comment_path', $parentPath . '%');
-            $statment->bindValue(':parent_path', $parentPath);
+            $statment->bindValue(':comment_path', $parentPath . '.___');
+            //$statment->bindValue(':parent_path', $parentPath);
             $statment->execute();
-            $result = $statment->fetchColumn();
+            $result = $statment->fetchColumn();    
+
             if (!$result) {
-                $newCommentPath = $this->strToArr($parentPath);
+                //преобразуем текстовый путь родительского комметария в массив
+                $newCommentPath = $this->strToArr($parentPath);    
                 $newCommentPath[] = '001';
                 return $newCommentPath;
             }
             
-            //преобразуем текстовый путь родительского комметария в массив
-            $newCommentPath = $this->strToArr($parentPath);
+            //преобразуем текстовый путь последнего из детей в массив
+            $newCommentPath = $this->strToArr($result);
 
-            //текстовый путь одного из потомков
-            $r = $this->strToArr($result);
-            
-            $newCommentPath[] = $r[count($newCommentPath)] + 1;
+            //Увеличиваем последнюю цифру в пути
+            $newCommentPath[count($newCommentPath) - 1] +=  1;
             
         } else {
 
             //если не дан путь родительского коментария, то пытаемся создать новый родительский комментрарий
-            $sql = "SELECT `comment_path` FROM comments WHERE file_id = :file_id 
-            ORDER BY `comment_path` DESC LIMIT 1";
+            $sql = "SELECT MAX(`comment_path`) FROM comments WHERE file_id = :file_id AND
+            `comment_path` LIKE :comment_path";
             $statment = $this->db->prepare($sql);
             $statment->bindValue(':file_id', $fileId);
+            $statment->bindValue(':comment_path', '___');
             $statment->execute();
             $result = $statment->fetchColumn();
-
             if (!$result) {
                 return array('001');
             }
-            //В пути 002.001.013  берётся первый элемент. И увеличивается на 1)
-            
-            $newCommentPath = $this->strToArr($result);
-            
-            $newCommentPath = array( $newCommentPath[0] + 1 ); 
+            //Путь корневого коментария  увеличивается на 1)
+                      
+            $newCommentPath = array( $result + 1 ); 
         }
         
         return $newCommentPath;
@@ -109,7 +107,6 @@ class CommentsMapper
     {   
         
         $path = $this->arrToStr($comment->path);
-
         $sql = "INSERT INTO comments VALUES (NULL, :file_id, :comment_path, :message,  FROM_UNIXTIME(:date_comment))";
         $statment = $this->db->prepare($sql);
         $statment->bindValue(':file_id', $comment->fileId);

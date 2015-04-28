@@ -11,22 +11,44 @@ Class Uploader
 
     public function createFile()
     {
+        
         $file = new \Uppy\File;
         $file->name = $_FILES['file']['name'];
         $file->size = $_FILES['file']['size'];
         $file->tmpName= $_FILES['file']['tmp_name'];
         $file->key = $file->generateKey();
         $file->dateLoad = time();
-
         return $file;
     }
 
+    public function saveFile(\Uppy\File $file, \Uppy\FileMapper $fileMapper, \Uppy\UtilHelper $utilHelper, \getID3 $getID3)
+    {   
+        //Извлечение метаданных с помощью getID3()        
+        $ID3 = $getID3->analyze($file->tmpName);
+        $file->info = \Uppy\MediaInfo::moveArrayInfoInFile($ID3);
+            
+        //сохранение файла 
+        $fileMapper->saveFile($file);
+        $fileName = $file->getFileNameInOS();
 
-    public function resizeImage($filename, $uploadPath, $maxSize = 200)
+        $target = $utilHelper->getPathUpload($file);
+
+        if (move_uploaded_file($file->tmpName, $target)){
+            if ($this->isImage($file)){
+                $this->resizeImage($fileName);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public function resizeImage($filename, $maxSize = 200)
     {
-        $path = $uploadPath . $filename;
-        list($width, $height) = getimagesize($path);
-
+        $path = $this->uploadPath . $filename;
+        $imageInfo = getimagesize($path);
+        $width = $imageInfo['0'];
+        $height = $imageInfo['1'];
+        $mime = $imageInfo['mime'];
         if (($width > 0) and ($height > 0)) {
             if ($width > $height) {
                 $newWidth = $maxSize;
@@ -39,13 +61,35 @@ Class Uploader
 
         // Загрузка
         $thumb = imagecreatetruecolor($newWidth, $newHeight);
-        $source = imagecreatefromjpeg($path);
-        //header('Content-Type: image/jpeg');
-        // Масштабирование
-        //imagecopyresized($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-        imagecopyresampled($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-        // Вывод
-        imagejpeg($thumb, "uppy/container/thumbs/$filename");
+        if ($mime == 'image/jpeg'){
+            $source = imagecreatefromjpeg($path);
+            //header('Content-Type: image/jpeg');
+            // Масштабирование
+            //imagecopyresized($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+            imagecopyresampled($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+            // Вывод
+            imagejpeg($thumb, "{$this->uploadPath}thumbs/$filename");
+            imagedestroy($source);
+        }
+        if ($mime == 'image/gif'){
+            $source = imagecreatefromgif($path);
+            //header('Content-Type: image/jpeg');
+            // Масштабирование
+            //imagecopyresized($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+            imagecopyresampled($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+            // Вывод
+            imagegif($thumb, "{$this->uploadPath}thumbs/$filename");
+        }
+        if ($mime == 'image/png'){
+            $source = imagecreatefrompng($path);
+            //header('Content-Type: image/jpeg');
+            // Масштабирование
+            //imagecopyresized($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+            imagecopyresampled($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+            // Вывод
+            imagepng($thumb, "{$this->uploadPath}thumbs/$filename");
+        }
+        
     }
 
 

@@ -9,26 +9,19 @@ class FileMapper
         $this->db = $db;
     }
 
-
-    public function getLastId()
-    {
-        $sql = "SELECT MAX(`id`) FROM `files`";
-        $statment = $this->db->prepare($sql);
-        $statment->execute();
-        $result = $statment->fetchColumn();
-        return ($result + 1);
-    }
-
     public function saveFile(\Uppy\File $file)
     {
-        $sql = "INSERT INTO files VALUES (NULL, :name, :file_key, FROM_UNIXTIME(:dateLoad), :size, :ID3)";
+        $sql = "INSERT INTO files VALUES (NULL, :name, :file_key, FROM_UNIXTIME(:date_load), :size, :id3)";
         $statment = $this->db->prepare($sql);
         $statment->bindValue(':name', $file->name);
         $statment->bindValue(':file_key', $file->key);
-        $statment->bindValue(':dateLoad', $file->dateLoad);
+        $statment->bindValue(':date_load', $file->dateLoad);
         $statment->bindValue(':size', $file->size);
-        $statment->bindValue(':ID3', $file->getInfoJson());
+        $statment->bindValue(':id3', \Uppy\MediaInfo::getInfoJson($file->info));
         $statment->execute();
+
+        $lastId = $this->db->lastInsertId();
+        $file->id = $lastId;
     }
 
     public function getId($key)
@@ -42,23 +35,32 @@ class FileMapper
         return $result;
     }
 
+    public function selectFile($result)
+    {
+        $file = new \Uppy\File;
+        $file->id = $result['id'];
+        $file->name = $result['name'];
+        $file->size = $result['size'];
+        $file->key = $result['file_key'];
+        $file->dateLoad = strtotime($result['date_load']);
+        $file->info = \Uppy\MediaInfo::moveJsonInfoInFile($result['id3']);
+        
+        return $file;
+    }
+
     public function getFiles()
     {
-        $sql = "SELECT `name`, `size`, `file_key` FROM files ORDER BY dateLoad DESC LIMIT 100";
+        $sql = "SELECT * FROM files ORDER BY date_load DESC LIMIT 100";
         $statment = $this->db->prepare($sql);
         $statment->execute();
-        $result = $statment->fetchAll(\PDO::FETCH_ASSOC);
+        $results = $statment->fetchAll(\PDO::FETCH_ASSOC);
 
-        $files = array();
-        foreach ($result as $r) {
-            $file = new \Uppy\File;
-            $file->name = $r['name'];
-            $file->size = $r['size'];
-            $file->key = $r['file_key'];
-            $files[] = $file;
+        $listFiles = array();
+        foreach ($results as $result) {
+            $listFiles[] = $this->selectFile($result);
         }
             
-        return $files;
+        return $listFiles;
     }
 
     public function loadFile($key)
@@ -72,15 +74,7 @@ class FileMapper
         if (!$result) {
             return false;
         }
-
-        $file = new \Uppy\File;
-        $file->id = $result['id'];
-        $file->name = $result['name'];
-        $file->size = $result['size'];
-        $file->key = $result['file_key'];
-        $file->dateLoad = strtotime($result['dateLoad']);
-        $file->moveJsonInfoInFile($result['ID3']);
         
-        return $file;
+        return $this->selectFile($result);;
     }
 }
