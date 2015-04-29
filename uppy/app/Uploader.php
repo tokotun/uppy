@@ -62,37 +62,22 @@ Class Uploader
             }
         }
 
-        // Загрузка
+        // ресэмплирование
         $thumb = imagecreatetruecolor($newWidth, $newHeight);
         if ($mime == 'image/jpeg'){
             $source = imagecreatefromjpeg($path);
-            //header('Content-Type: image/jpeg');
-            // Масштабирование
-            //imagecopyresized($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-            imagecopyresampled($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-            // Вывод
-            imagejpeg($thumb, "{$this->uploadPath}thumbs/$filename");
-            imagedestroy($source);
-        }
-        if ($mime == 'image/gif'){
+        } elseif ($mime == 'image/gif'){
             $source = imagecreatefromgif($path);
-            //header('Content-Type: image/jpeg');
-            // Масштабирование
-            //imagecopyresized($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-            imagecopyresampled($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-            // Вывод
-            imagegif($thumb, "{$this->uploadPath}thumbs/$filename");
-        }
-        if ($mime == 'image/png'){
+        } elseif ($mime == 'image/png'){
             $source = imagecreatefrompng($path);
-            //header('Content-Type: image/jpeg');
-            // Масштабирование
-            //imagecopyresized($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-            imagecopyresampled($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-            // Вывод
-            imagepng($thumb, "{$this->uploadPath}thumbs/$filename");
+        } else {
+            return false;
         }
-        
+        imagecopyresampled($thumb, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+        // вывод
+        imagejpeg($thumb, "{$this->uploadPath}thumbs/$filename");
+        imagedestroy($source);
+
     }
 
 

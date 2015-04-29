@@ -25,7 +25,7 @@ class CommentsMapper
         foreach ($result as $r) {
             $comment = new \Uppy\Comment;
             $comment->id = $r['id'];
-            $comment->path = $this->strToArr($r['comment_path']); 
+            $comment->path = $this->pathToArray($r['comment_path']); 
             $comment->message = $r['message'];
             $comment->dateLoad = $r['date_comment'];
             $comments[] = $comment;
@@ -71,13 +71,13 @@ class CommentsMapper
 
             if (!$result) {
                 //преобразуем текстовый путь родительского комметария в массив
-                $newCommentPath = $this->strToArr($parentPath);    
+                $newCommentPath = $this->pathToArray($parentPath);    
                 $newCommentPath[] = '001';
                 return $newCommentPath;
             }
             
             //преобразуем текстовый путь последнего из детей в массив
-            $newCommentPath = $this->strToArr($result);
+            $newCommentPath = $this->pathToArray($result);
 
             //Увеличиваем последнюю цифру в пути
             $newCommentPath[count($newCommentPath) - 1] +=  1;
@@ -106,7 +106,7 @@ class CommentsMapper
     public function saveComment(\Uppy\Comment $comment)
     {   
         
-        $path = $this->arrToStr($comment->path);
+        $path = $this->pathToString($comment->path);
         $sql = "INSERT INTO comments VALUES (NULL, :file_id, :comment_path, :message,  FROM_UNIXTIME(:date_comment))";
         $statment = $this->db->prepare($sql);
         $statment->bindValue(':file_id', $comment->fileId);
@@ -116,7 +116,7 @@ class CommentsMapper
         $statment->execute();
     }
 
-    public function strToArr($path){
+    public function pathToArray($path){
         
         $path = explode(".", $path);
         
@@ -127,7 +127,7 @@ class CommentsMapper
         return $path;
     }
 
-    public function arrToStr($path){
+    public function pathToString($path){
         foreach ($path as $key => $value) {
             $path[$key] = sprintf('%03u', $path[$key]);
         }
