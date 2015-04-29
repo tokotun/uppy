@@ -17,40 +17,39 @@
         {% else %}
             <h1>Файл не найден!</h1>
         {% endif %}
-
-        {% if file.getTypeInfo() == 'audio' %}
+        {% if file.mediaInfo.getTypeInfo() == 'audio' %}
             <table class="table table-bordered">
                 <tr><td colspan="2"><h4>Таги</h4></td></tr>
-                <tr><td>Название:</td>      <td>{{  file.getTitle()  }}</td></tr>
-                <tr><td>Исполнитель:</td>   <td>{{  file.getArtistName()  }}</td></tr>
-                <tr><td>Альбом:</td>        <td>{{  file.getAlbumName()  }}</td></tr>
-                <tr><td>Год:</td>           <td>{{  file.getYear()  }}</td> </tr>
-                <tr><td>Комментарий:</td>   <td>{{  file.getComment()  }}</td></tr>
-                <tr><td>Жанр:</td>          <td>{{  file.getGenre()  }}</td></tr>
+                <tr><td>Название:</td>      <td>{{  file.mediaInfo.getTitle()  }}</td></tr>
+                <tr><td>Исполнитель:</td>   <td>{{  file.mediaInfo.getArtistName()  }}</td></tr>
+                <tr><td>Альбом:</td>        <td>{{  file.mediaInfo.getAlbumName()  }}</td></tr>
+                <tr><td>Год:</td>           <td>{{  file.mediaInfo.getYear()  }}</td> </tr>
+                <tr><td>Комментарий:</td>   <td>{{  file.mediaInfo.getComment()  }}</td></tr>
+                <tr><td>Жанр:</td>          <td>{{  file.mediaInfo.getGenre()  }}</td></tr>
 
                 <tr><td colspan="2"><h4>Общее</h4></td></tr>
-                <tr><td>Длина:</td>         <td>{{  file.getSonglength()  }}</td></tr>
+                <tr><td>Длина:</td>         <td>{{  file.mediaInfo.getSonglength()  }}</td></tr>
 
                 <tr><td colspan="2"><h4>Аудио</h4></td></tr>
-                <tr><td>Битрейт аудио:</td>             <td>{{  file.getOverallBitrate()  }}</td></tr>
-                <tr><td>Частота дискретизации:</td>     <td>{{  file.getAudioFrequency()  }}</td></tr>
-                <tr><td>Количество каналов аудио:</td>  <td>{{  file.getChannelsCount()  }}</td></tr>
-                <tr><td>Кодек:</td>                     <td>{{  file.getFileType()  }}</td></tr>
+                <tr><td>Битрейт аудио:</td>             <td>{{  file.mediaInfo.getOverallBitrate()  }}</td></tr>
+                <tr><td>Частота дискретизации:</td>     <td>{{  file.mediaInfo.getAudioFrequency()  }}</td></tr>
+                <tr><td>Количество каналов аудио:</td>  <td>{{  file.mediaInfo.getChannelsCount()  }}</td></tr>
+                <tr><td>Кодек:</td>                     <td>{{  file.mediaInfo.getFileType()  }}</td></tr>
             </table>
         {% endif %}
 
-        {% if file.getTypeInfo() == 'video' %}
+        {% if file.mediaInfo.getTypeInfo() == 'video' %}
             <table class="table table-bordered">
 
                 <tr><td colspan="2"><h4>Общее</h4></td></tr>
-                <tr><td>Длина:</td>     <td>{{  file.getPlayTime()   }}</td></tr>
+                <tr><td>Длина:</td>     <td>{{  file.mediaInfo.getPlayTime()   }}</td></tr>
 
                 <tr><td colspan="2"><h4>Видео</h4></td></tr>
-                <tr><td>Видео формат:</td>      <td>{{  file.getFileType()  }}</td></tr>
-                <tr><td>Битрейт видео:</td>     <td>{{  file.getOverallBitrate()  }}</td></tr>
-                <tr><td>Ширина:</td>            <td>{{  file.getWidth() }}</td></tr>
-                <tr><td>Высота:</td>            <td>{{  file.getHeight()  }}</td></tr>
-                <tr><td>FPS:</td>               <td>{{  file.getFrameRate()  }}</td></tr>
+                <tr><td>Видео формат:</td>      <td>{{  file.mediaInfo.getFileType()  }}</td></tr>
+                <tr><td>Битрейт видео:</td>     <td>{{  file.mediaInfo.getOverallBitrate()  }}</td></tr>
+                <tr><td>Ширина:</td>            <td>{{  file.mediaInfo.getWidth() }}</td></tr>
+                <tr><td>Высота:</td>            <td>{{  file.mediaInfo.getHeight()  }}</td></tr>
+                <tr><td>FPS:</td>               <td>{{  file.mediaInfo.getFrameRate()  }}</td></tr>
 
             </table>
         {% endif %}

@@ -9,23 +9,26 @@ Class Uploader
         $this->uploadPath = $uploadPath;       
     }
 
-    public function createFile()
+    public function createFile(\getID3 $getID3)
     {
-        
         $file = new \Uppy\File;
         $file->name = $_FILES['file']['name'];
         $file->size = $_FILES['file']['size'];
         $file->tmpName= $_FILES['file']['tmp_name'];
         $file->key = $file->generateKey();
         $file->dateLoad = time();
+
+        //Извлечение метаданных с помощью getID3()        
+        $ID3 = $getID3->analyze($file->tmpName);
+        $file->mediaInfo->moveArrayInfoInFile($ID3);
+
+
         return $file;
     }
 
-    public function saveFile(\Uppy\File $file, \Uppy\FileMapper $fileMapper, \Uppy\UtilHelper $utilHelper, \getID3 $getID3)
+    public function saveFile(\Uppy\File $file, \Uppy\FileMapper $fileMapper, \Uppy\UtilHelper $utilHelper)
     {   
-        //Извлечение метаданных с помощью getID3()        
-        $ID3 = $getID3->analyze($file->tmpName);
-        $file->info = \Uppy\MediaInfo::moveArrayInfoInFile($ID3);
+
             
         //сохранение файла 
         $fileMapper->saveFile($file);

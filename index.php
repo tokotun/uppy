@@ -96,10 +96,10 @@ $app->post('/upload',function () use ($app){
     if (isset($_POST['submit']) and ($errorLoad->getError() == false)) {
 
         $getID3 = $app->getID3;   
-        $file = $uploader->createFile();
+        $file = $uploader->createFile($getID3);
     
-        if ($uploader->saveFile($file, $fileMapper, $utilHelper, $getID3)){
-            //$app->response->redirect("file/$file->key", 301);
+        if ($uploader->saveFile($file, $fileMapper, $utilHelper)){
+            $app->response->redirect("file/$file->key", 301);
         } else {
             $errorLoad->setErrorMoveFile();
         }

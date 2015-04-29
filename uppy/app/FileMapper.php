@@ -17,7 +17,7 @@ class FileMapper
         $statment->bindValue(':file_key', $file->key);
         $statment->bindValue(':date_load', $file->dateLoad);
         $statment->bindValue(':size', $file->size);
-        $statment->bindValue(':id3', \Uppy\MediaInfo::getInfoJson($file->info));
+        $statment->bindValue(':id3', $file->mediaInfo->getInfoJson());
         $statment->execute();
 
         $lastId = $this->db->lastInsertId();
@@ -43,8 +43,7 @@ class FileMapper
         $file->size = $result['size'];
         $file->key = $result['file_key'];
         $file->dateLoad = strtotime($result['date_load']);
-        $file->info = \Uppy\MediaInfo::moveJsonInfoInFile($result['id3']);
-        
+        $file->mediaInfo->moveJsonInfoInFile($result['id3']);
         return $file;
     }
 
@@ -54,7 +53,6 @@ class FileMapper
         $statment = $this->db->prepare($sql);
         $statment->execute();
         $results = $statment->fetchAll(\PDO::FETCH_ASSOC);
-
         $listFiles = array();
         foreach ($results as $result) {
             $listFiles[] = $this->selectFile($result);
@@ -75,6 +73,6 @@ class FileMapper
             return false;
         }
         
-        return $this->selectFile($result);;
+        return $this->selectFile($result);
     }
 }

@@ -1,7 +1,7 @@
 ﻿vendor
 tmp
 forTest
-uppy/container/*.*
+uppy/container/*
 !uppy/container/.htaccess
-uppy/container/thumbs/*.*
+uppy/container/thumbs/*
 !uppy/container/thumbs/.placeholder
